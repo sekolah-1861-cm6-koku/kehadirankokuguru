@@ -39,3 +39,161 @@
             padding: 12px 15px;
             border: 1.5px solid #fee2e2;
             border-radius: 12px;
+            margin-top: 8px;
+            margin-bottom: 25px;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+        .input-style:focus {
+            border-color: #dc2626;
+            outline: none;
+            ring: 2px;
+            ring-color: #fecaca;
+        }
+        .btn-detect {
+            background-color: #4b5563;
+            color: white;
+            padding: 14px;
+            border-radius: 12px;
+            width: 100%;
+            font-weight: 600;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+        .btn-clockin {
+            background-color: #dc2626;
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            width: 100%;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.3);
+            cursor: pointer;
+        }
+        .btn-clockin:disabled {
+            background-color: #fca5a5;
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .status-pill {
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="canva-card">
+    <img src="https://imgur.com/DLy3jZn.png" alt="Logo SKBTHO 2" class="logo-img">
+
+    <div class="mb-6">
+        <h1 class="text-xl font-bold text-gray-800 leading-tight">Pengesahan Lokasi Clock In Kokurikulum</h1>
+        <p class="text-red-600 font-medium text-sm mt-1">SK Bandar Tun Hussein Onn 2</p>
+    </div>
+
+    <div id="statusBanner" class="status-pill bg-gray-100 text-gray-500 border border-gray-200">
+        Sila sahkan lokasi anda
+    </div>
+
+    <div class="text-left">
+        <label class="text-xs font-bold text-gray-400 uppercase ml-1">Nama Penuh Guru</label>
+        <input type="text" id="teacherName" class="input-style" placeholder="NAMA ANDA" oninput="this.value = this.value.toUpperCase()">
+    </div>
+
+    <button id="detectBtn" class="btn-detect" onclick="detectLocation()">
+        🔍 Sahkan Lokasi Saya
+    </button>
+    
+    <button id="inBtn" class="btn-clockin" onclick="saveRecord()" disabled>
+        CLOCK IN
+    </button>
+
+    <div id="distanceWrapper" class="hidden mt-6 p-3 bg-red-50 rounded-xl border border-red-100">
+        <p id="infoJarak" class="text-[11px] text-red-700 font-medium"></p>
+    </div>
+</div>
+
+<script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby36C50CxeYbp3_hXAgOBxOeXHgUhZkfmSvS0n1YFs/exec";
+
+    // KOORDINAT SEKOLAH
+    const SCHOOL_LAT = 3.052485;
+    const SCHOOL_LNG = 101.754269;
+    const ALLOWED_RADIUS = 100;
+
+    function detectLocation() {
+        const banner = document.getElementById('statusBanner');
+        const inBtn = document.getElementById('inBtn');
+        const distWrap = document.getElementById('distanceWrapper');
+        
+        banner.innerText = "⌛ Mengesan GPS...";
+        
+        if (!navigator.geolocation) {
+            alert("GPS tidak disokong pada peranti ini.");
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const distance = calculateDistance(SCHOOL_LAT, SCHOOL_LNG, pos.coords.latitude, pos.coords.longitude);
+            
+            distWrap.classList.remove('hidden');
+            document.getElementById('infoJarak').innerText = "Jarak: " + Math.round(distance) + " meter dari sekolah.";
+
+            if (distance <= ALLOWED_RADIUS) {
+                banner.innerText = "✅ Lokasi Disahkan";
+                banner.className = "status-pill bg-green-100 text-green-600 border border-green-200";
+                inBtn.disabled = false;
+            } else {
+                banner.innerText = "❌ Luar Kawasan";
+                banner.className = "status-pill bg-red-100 text-red-600 border border-red-200";
+                inBtn.disabled = true;
+                alert("Anda berada di luar kawasan sekolah (" + Math.round(distance) + "m).");
+            }
+        }, (err) => {
+            alert("Ralat GPS: Sila benarkan akses lokasi pada telefon anda.");
+        }, { enableHighAccuracy: true });
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371e3;
+        const d1 = lat1 * Math.PI/180;
+        const d2 = lat2 * Math.PI/180;
+        const df = (lat2-lat1) * Math.PI/180;
+        const dl = (lon2-lon1) * Math.PI/180;
+        const a = Math.sin(df/2) * Math.sin(df/2) + Math.cos(d1) * Math.cos(d2) * Math.sin(dl/2) * Math.sin(dl/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    function saveRecord() {
+        const nama = document.getElementById('teacherName').value;
+        const btn = document.getElementById('inBtn');
+
+        if (!nama) return alert("Sila masukkan nama anda.");
+
+        btn.disabled = true;
+        btn.innerText = "MENGHANTAR...";
+
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify({ nama: nama, status: "CLOCK-IN KOKO" })
+        })
+        .then(() => {
+            alert("Berjaya! Kehadiran anda telah direkodkan.");
+            location.reload();
+        })
+        .catch(() => {
+            alert("Ralat penghantaran.");
+            btn.disabled = false;
+        });
+    }
+</script>
+
+</body>
+</html>
