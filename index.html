@@ -14,13 +14,14 @@
         .btn-detect { background-color: #4b5563; color: white; padding: 15px; border-radius: 15px; width: 100%; font-weight: 600; margin-bottom: 12px; }
         .btn-clockin { background-color: #dc2626; color: white; padding: 18px; border-radius: 15px; width: 100%; font-weight: 700; box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.4); }
         .btn-clockin:disabled { background-color: #fca5a5; opacity: 0.7; cursor: not-allowed; }
+        .btn-view { border: 2px solid #dc2626; color: #dc2626; padding: 12px; border-radius: 15px; width: 100%; font-weight: 600; margin-top: 20px; display: block; }
     </style>
 </head>
 <body>
 
 <div class="canva-card">
     <img src="https://imgur.com/DLy3jZn.png" class="logo-img">
-    <h1 class="text-xl font-bold text-gray-800 leading-tight">Clock In Kokurikulum</h1>
+    <h1 class="text-xl font-bold text-gray-800">Clock In Kokurikulum</h1>
     <p class="text-red-600 font-bold text-sm mb-6 uppercase">SK Bandar Tun Hussein Onn 2</p>
 
     <div class="text-left">
@@ -31,6 +32,8 @@
     <button id="detectBtn" class="btn-detect" onclick="detectLocation()">🔍 SAHKAN LOKASI SAYA</button>
     <button id="inBtn" class="btn-clockin" onclick="saveRecord()" disabled>CLOCK IN</button>
     
+    <a href="https://docs.google.com/spreadsheets/d/1ojyxAPba38LEElc6o_CzlnkcAgI3DB-XxJAchg0bBEo/edit?usp=sharing" target="_blank" class="btn-view">📋 LIHAT REKOD</a>
+
     <div id="distanceWrapper" class="hidden mt-4 p-3 bg-red-50 rounded-xl">
         <p id="infoJarak" class="text-xs text-red-700 font-bold italic"></p>
     </div>
@@ -38,12 +41,14 @@
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxBWkKJkO-6oqHys7w3pvrhjf_299Cqvw0sy3OhWytjbSzXyYMQK7_X6ZTOYxSgC2Tc/exec";
+    // URL Web App Terbaru
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxrJAvYuqsYEyCjjOYI75DYa5jGs2MwYr_ad7ms1M8jQYd4Ca64CkQPi_Agf1-v_590/exec";
+    
     const SCHOOL_LAT = 3.023221;
     const SCHOOL_LNG = 101.761705;
     const ALLOWED_RADIUS = 500;
 
-    // 1. Fungsi Jana/Ambil ID Peranti Unik
+    // Menjana ID Peranti Unik
     let deviceId = localStorage.getItem('skbtho2_dev_id');
     if (!deviceId) {
         deviceId = 'DEV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
@@ -59,9 +64,9 @@
             
             if (dist <= ALLOWED_RADIUS) {
                 document.getElementById('inBtn').disabled = false;
-                alert("LOKASI DISAHKAN!");
+                alert("LOKASI DISAHKAN! Sila tekan Clock In.");
             } else {
-                alert("DI LUAR KAWASAN!");
+                alert("ANDA DI LUAR KAWASAN (Radius 500m). Jarak: " + Math.round(dist) + "m");
             }
         }, () => alert("Sila aktifkan GPS."), { enableHighAccuracy: true });
     }
@@ -80,11 +85,11 @@
         const nama = document.getElementById('teacherName').value;
         if (!nama) return alert("Sila isi nama!");
 
-        // 2. Semakan Sekat Nama Berbeza pada Telefon Sama
-        const savedName = localStorage.getItem('skbtho2_last_name');
-        if (savedName && savedName !== nama) {
-            const confirmChange = confirm("Peranti ini sebelum ini digunakan oleh " + savedName + ". Adakah anda pasti ini peranti anda?");
-            if (!confirmChange) return;
+        // Semakan Device ID (Cegah tumpang phone)
+        const lastUsedName = localStorage.getItem('skbtho2_last_name');
+        if (lastUsedName && lastUsedName !== nama) {
+            const warning = confirm("Peranti ini dikesan telah digunakan oleh " + lastUsedName + ". Adakah anda ingin teruskan?");
+            if (!warning) return;
         }
 
         document.getElementById('inBtn').innerText = "MENGHANTAR...";
@@ -98,11 +103,13 @@
                 status: "CLOCK-IN KOKO",
                 deviceId: deviceId 
             })
-        })
-        .then(() => {
+        }).then(() => {
             localStorage.setItem('skbtho2_last_name', nama);
-            alert("BERJAYA! ID Peranti anda direkodkan.");
+            alert("BERJAYA! Rekod dihantar bersama ID Peranti.");
             location.reload();
+        }).catch(() => {
+            alert("Ralat penghantaran.");
+            document.getElementById('inBtn').disabled = false;
         });
     }
 </script>
