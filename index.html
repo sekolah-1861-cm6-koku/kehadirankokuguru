@@ -15,6 +15,8 @@
         .btn-clockin { background-color: #dc2626; color: white; padding: 18px; border-radius: 15px; width: 100%; font-weight: 700; box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.4); }
         .btn-clockin:disabled { background-color: #fca5a5; opacity: 0.7; cursor: not-allowed; }
         .btn-view { border: 2px solid #dc2626; color: #dc2626; padding: 12px; border-radius: 15px; width: 100%; font-weight: 600; margin-top: 20px; display: block; }
+        /* Style untuk mesej sekatan */
+        .block-message { background-color: #fee2e2; color: #b91c1c; padding: 15px; border-radius: 15px; font-weight: 700; font-size: 14px; margin-bottom: 20px; border: 1px solid #fecaca; }
     </style>
 </head>
 <body>
@@ -24,37 +26,51 @@
     <h1 class="text-xl font-bold text-gray-800">Clock In Kokurikulum</h1>
     <p class="text-red-600 font-bold text-sm mb-6 uppercase">SK Bandar Tun Hussein Onn 2</p>
 
-    <div class="text-left">
-        <label class="text-xs font-bold text-gray-500 uppercase ml-2">Nama Penuh Guru</label>
-        <input type="text" id="teacherName" class="input-style" placeholder="TAIP NAMA ANDA" oninput="this.value = this.value.toUpperCase()">
+    <div id="formSection">
+        <div class="text-left">
+            <label class="text-xs font-bold text-gray-500 uppercase ml-2">Nama Penuh Guru</label>
+            <input type="text" id="teacherName" class="input-style" placeholder="TAIP NAMA ANDA" oninput="this.value = this.value.toUpperCase()">
+        </div>
+
+        <button id="detectBtn" class="btn-detect" onclick="detectLocation()">🔍 SAHKAN LOKASI SAYA</button>
+        <button id="inBtn" class="btn-clockin" onclick="saveRecord()" disabled>CLOCK IN</button>
     </div>
 
-    <button id="detectBtn" class="btn-detect" onclick="detectLocation()">🔍 SAHKAN LOKASI SAYA</button>
-    <button id="inBtn" class="btn-clockin" onclick="saveRecord()" disabled>CLOCK IN</button>
+    <div id="blockSection" class="hidden">
+        <div class="block-message">
+            ⚠️ PERANTI INI SUDAH DIGUNAKAN UNTUK CLOCK IN HARI INI.
+        </div>
+        <p class="text-xs text-gray-500 mb-4">Satu peranti hanya dibenarkan untuk satu rekod kehadiran sahaja.</p>
+    </div>
     
     <a href="https://docs.google.com/spreadsheets/d/1ojyxAPba38LEElc6o_CzlnkcAgI3DB-XxJAchg0bBEo/edit?usp=sharing" target="_blank" class="btn-view">📋 LIHAT REKOD</a>
 
     <div id="distanceWrapper" class="hidden mt-4 p-3 bg-red-50 rounded-xl">
         <p id="infoJarak" class="text-xs text-red-700 font-bold italic"></p>
     </div>
-    <p class="mt-4 text-[10px] text-gray-400">ID Peranti: <span id="devIdDisplay">...</span></p>
 </div>
 
 <script>
-    // URL Web App Terbaru
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxrJAvYuqsYEyCjjOYI75DYa5jGs2MwYr_ad7ms1M8jQYd4Ca64CkQPi_Agf1-v_590/exec";
-    
     const SCHOOL_LAT = 3.023221;
     const SCHOOL_LNG = 101.761705;
     const ALLOWED_RADIUS = 500;
 
-    // Menjana ID Peranti Unik
+    // --- LOGIK SEKATAN PERANTI ---
+    const hasSubmitted = localStorage.getItem('skbtho2_submitted');
+    
+    // Jika peranti ini sudah pernah submit, sembunyikan borang, tunjuk mesej sekat
+    if (hasSubmitted === 'true') {
+        document.getElementById('formSection').classList.add('hidden');
+        document.getElementById('blockSection').classList.remove('hidden');
+    }
+
+    // Penjanaan ID Peranti
     let deviceId = localStorage.getItem('skbtho2_dev_id');
     if (!deviceId) {
         deviceId = 'DEV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
         localStorage.setItem('skbtho2_dev_id', deviceId);
     }
-    document.getElementById('devIdDisplay').innerText = deviceId;
 
     function detectLocation() {
         navigator.geolocation.getCurrentPosition((pos) => {
@@ -64,19 +80,17 @@
             
             if (dist <= ALLOWED_RADIUS) {
                 document.getElementById('inBtn').disabled = false;
-                alert("LOKASI DISAHKAN! Sila tekan Clock In.");
+                alert("LOKASI DISAHKAN!");
             } else {
-                alert("ANDA DI LUAR KAWASAN (Radius 500m). Jarak: " + Math.round(dist) + "m");
+                alert("DI LUAR KAWASAN!");
             }
         }, () => alert("Sila aktifkan GPS."), { enableHighAccuracy: true });
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
         const R = 6371e3;
-        const d1 = lat1 * Math.PI/180;
-        const d2 = lat2 * Math.PI/180;
-        const df = (lat2-lat1) * Math.PI/180;
-        const dl = (lon2-lon1) * Math.PI/180;
+        const d1 = lat1 * Math.PI/180; const d2 = lat2 * Math.PI/180;
+        const df = (lat2-lat1) * Math.PI/180; const dl = (lon2-lon1) * Math.PI/180;
         const a = Math.sin(df/2) * Math.sin(df/2) + Math.cos(d1) * Math.cos(d2) * Math.sin(dl/2) * Math.sin(dl/2);
         return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
@@ -84,13 +98,6 @@
     function saveRecord() {
         const nama = document.getElementById('teacherName').value;
         if (!nama) return alert("Sila isi nama!");
-
-        // Semakan Device ID (Cegah tumpang phone)
-        const lastUsedName = localStorage.getItem('skbtho2_last_name');
-        if (lastUsedName && lastUsedName !== nama) {
-            const warning = confirm("Peranti ini dikesan telah digunakan oleh " + lastUsedName + ". Adakah anda ingin teruskan?");
-            if (!warning) return;
-        }
 
         document.getElementById('inBtn').innerText = "MENGHANTAR...";
         document.getElementById('inBtn').disabled = true;
@@ -104,8 +111,9 @@
                 deviceId: deviceId 
             })
         }).then(() => {
-            localStorage.setItem('skbtho2_last_name', nama);
-            alert("BERJAYA! Rekod dihantar bersama ID Peranti.");
+            // SET STATUS SUBMITTED PADA STORAGE TELEFON
+            localStorage.setItem('skbtho2_submitted', 'true');
+            alert("BERJAYA! Rekod dihantar. Peranti anda telah dikunci untuk satu hantaran sahaja.");
             location.reload();
         }).catch(() => {
             alert("Ralat penghantaran.");
