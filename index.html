@@ -9,11 +9,8 @@
     <style>
         body { font-family: 'Poppins', sans-serif; background-color: #fef2f2; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .canva-card { background: white; width: 100%; max-width: 450px; padding: 30px 25px; border-radius: 35px; box-shadow: 0 25px 50px -12px rgba(220, 38, 38, 0.15); text-align: center; border-top: 10px solid #dc2626; position: relative; overflow: hidden; }
-        
-        /* Logo dijadikan butang rahsia */
-        .logo-img { width: 100px; margin: 0 auto 15px auto; display: block; cursor: default; user-select: none; -webkit-user-drag: none; }
-        
-        .select-style { width: 100%; padding: 14px; border: 2px solid #fee2e2; border-radius: 15px; margin-bottom: 20px; font-weight: 600; background-color: white; color: #374151; appearance: none; cursor: pointer; }
+        .logo-img { width: 100px; margin: 0 auto 15px auto; display: block; cursor: pointer; user-select: none; -webkit-user-drag: none; }
+        .select-style { width: 100%; padding: 14px; border: 2px solid #fee2e2; border-radius: 15px; margin-bottom: 20px; font-weight: 600; background-color: white; color: #374151; appearance: none; }
         .select-style option.done { background-color: #d1fae5 !important; color: #065f46 !important; } 
         .btn-detect { background-color: #4b5563; color: white; padding: 15px; border-radius: 15px; width: 100%; font-weight: 600; margin-bottom: 12px; }
         .btn-clockin { background-color: #dc2626; color: white; padding: 18px; border-radius: 15px; width: 100%; font-weight: 700; box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.4); }
@@ -24,12 +21,12 @@
 <body>
 
 <div class="canva-card">
-    <img src="https://imgur.com/DLy3jZn.png" class="logo-img" id="secretLogo" onclick="handleSecretClick()">
+    <img src="https://imgur.com/DLy3jZn.png" class="logo-img" onclick="handleSecretClick()">
     
     <div id="lockScreen" class="lock-overlay hidden">
         <span class="text-6xl mb-4">🔒</span>
         <h2 class="text-2xl font-bold text-red-600 uppercase">Sistem Ditutup</h2>
-        <p id="lockReason" class="text-sm text-gray-500 mt-2 text-center"></p>
+        <p class="text-sm text-gray-500 mt-2 text-center">Kehadiran belum dibuka atau telah ditutup oleh Admin.</p>
     </div>
 
     <h1 class="text-lg font-bold text-gray-800 leading-tight">Clock In Kokurikulum</h1>
@@ -70,11 +67,16 @@
     }
 
     window.onload = async function() {
-        checkStatus();
+        // Semak status lock
+        if(localStorage.getItem('manual_lock') === 'true') {
+            document.getElementById('lockScreen').classList.remove('hidden');
+        }
+
         if(localStorage.getItem('skbtho2_submitted') === 'true') {
             document.getElementById('formSection').classList.add('hidden');
             document.getElementById('blockSection').classList.remove('hidden');
         }
+
         try {
             const resp = await fetch(WEB_APP_URL);
             const namesDone = await resp.json();
@@ -90,39 +92,22 @@
         } catch(e) { console.log("Load error"); }
     }
 
-    function checkStatus() {
-        const now = new Date();
-        const currentTime = now.getHours() + (now.getMinutes() / 60);
-        const adminOverride = localStorage.getItem('system_override');
-
-        if (adminOverride === 'AKTIF') {
-            document.getElementById('lockScreen').classList.add('hidden');
-            return; 
-        }
-
-        const isTimeRange = (currentTime >= 15.5 && currentTime < 18);
-        if (!isTimeRange) {
-            document.getElementById('lockScreen').classList.remove('hidden');
-            document.getElementById('lockReason').innerText = currentTime < 15.5 ? 
-                "Sistem akan dibuka secara automatik jam 3:30 PM." : 
-                "Sistem telah ditutup secara automatik jam 6:00 PM.";
-        }
-    }
-
     function adminControl() {
-        const pass = prompt("MOD ADMIN DIAKTIFKAN.\nSila masukkan Passcode:");
+        const pass = prompt("SILA MASUKKAN PASSCODE ADMIN:");
         if(pass === "KOKU4055") {
-            const cmd = prompt("TAIP 'AKTIF' UNTUK OVERRIDE WAKTU\nTAIP 'NYAHAKTIF' UNTUK IKUT JADUAL AUTO");
-            if(cmd && cmd.toUpperCase() === 'AKTIF') {
-                localStorage.setItem('system_override', 'AKTIF');
-                alert("OVERRIDE AKTIF: Sistem dibuka sekarang.");
-                location.reload();
-            } else if(cmd && cmd.toUpperCase() === 'NYAHAKTIF') {
-                localStorage.setItem('system_override', 'NYAHAKTIF');
-                alert("SISTEM KEMBALI KEPADA JADUAL ASAL.");
-                location.reload();
+            const isCurrentlyLocked = localStorage.getItem('manual_lock') === 'true';
+            
+            if(isCurrentlyLocked) {
+                localStorage.setItem('manual_lock', 'false');
+                alert("SISTEM BERJAYA DIBUKA (UNLOCKED)");
+            } else {
+                localStorage.setItem('manual_lock', 'true');
+                alert("SISTEM BERJAYA DIKUNCI (LOCKED)");
             }
-        } else if(pass !== null) { alert("AKSES DITOLAK!"); }
+            location.reload();
+        } else if(pass !== null) { 
+            alert("PASSCODE SALAH!"); 
+        }
     }
 
     function detectLocation() {
@@ -130,7 +115,7 @@
             const dist = calculateDistance(3.023221, 101.761705, pos.coords.latitude, pos.coords.longitude);
             if (dist <= 500) { document.getElementById('inBtn').disabled = false; alert("LOKASI DISAHKAN!"); }
             else { alert("ANDA DI LUAR KAWASAN!"); }
-        }, () => alert("Sila benarkan GPS."), { enableHighAccuracy: true });
+        }, () => alert("Sila aktifkan GPS."), { enableHighAccuracy: true });
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
