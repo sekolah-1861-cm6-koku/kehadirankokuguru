@@ -118,10 +118,21 @@
 
     function detectLocation() {
         navigator.geolocation.getCurrentPosition((pos) => {
-            const dist = calculateDistance(3.023221, 101.761705, pos.coords.latitude, pos.coords.longitude);
-            if (dist <= 500) { document.getElementById('inBtn').disabled = false; alert("LOKASI DISAHKAN!"); }
-            else { alert("ANDA DI LUAR KAWASAN!"); }
-        }, () => alert("Sila aktifkan GPS."), { enableHighAccuracy: true });
+            // KOORDINAT BARU YANG ANDA BERIKAN
+            const schoolLat = 3.052485;
+            const schoolLog = 101.754269;
+            
+            // Jarak dalam meter (Sekarang diset 500 meter)
+            const dist = calculateDistance(schoolLat, schoolLog, pos.coords.latitude, pos.coords.longitude);
+            
+            if (dist <= 500) { 
+                document.getElementById('inBtn').disabled = false; 
+                alert("LOKASI DISAHKAN! Jarak anda: " + Math.round(dist) + " meter dari pusat sekolah."); 
+            }
+            else { 
+                alert("ANDA DI LUAR KAWASAN! Jarak anda: " + Math.round(dist) + " meter. Sila pastikan anda berada di kawasan sekolah."); 
+            }
+        }, () => alert("Sila aktifkan GPS pada telefon anda."), { enableHighAccuracy: true });
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
