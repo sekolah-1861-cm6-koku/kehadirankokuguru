@@ -22,12 +22,12 @@
 <body>
 
 <div class="canva-card">
-    <div class="btn-admin" onclick="adminControl()">ADMIN SYSTEM</div>
+    <div class="btn-admin" onclick="adminControl()">ADMIN OVERRIDE</div>
     
     <div id="lockScreen" class="lock-overlay hidden">
-        <span id="lockIcon" class="text-6xl mb-4">🔒</span>
+        <span class="text-6xl mb-4">🔒</span>
         <h2 id="lockTitle" class="text-2xl font-bold text-red-600 uppercase">Sistem Ditutup</h2>
-        <p id="lockReason" class="text-sm text-gray-500 mt-2 text-center">Kehadiran hanya dibuka pada jam 3:30 PM - 6:00 PM sahaja.</p>
+        <p id="lockReason" class="text-sm text-gray-500 mt-2 text-center"></p>
     </div>
 
     <img src="https://imgur.com/DLy3jZn.png" class="logo-img">
@@ -48,18 +48,14 @@
     <div id="blockSection" class="hidden py-4 text-green-700 font-bold bg-green-50 rounded-2xl border border-green-100 mt-4 text-sm">
         ✅ REKOD PERANTI INI TELAH DIHANTAR.
     </div>
-    
-    <div id="distanceWrapper" class="hidden mt-4 p-3 bg-red-50 rounded-xl border border-red-100">
-        <p id="infoJarak" class="text-xs text-red-700 font-bold italic"></p>
-    </div>
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxrJAvYuqsYEyCjjOYI75DYa5jGs2MwYr_ad7ms1M8jQYd4Ca64CkQPi_Agf1-v_590/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxrJAvYuqsYEyCjjOYI75DYa5jGs2MwYr_ad7ms1M8jQYd4Ca64Ck (URL ANDA)";
     const senaraiGuru = ["ABDUL KAHAR BIN AWANG SEMAN", "AINA ATHIRAH BINTI AHMAD SENARI", "AMIRAH BINTI MOHD ALWI", "AMINUDDIN BIN ISMAIL", "ARINAWATI BINTI MOHD YAH", "AWATIF BINTI MD YUSOP", "AZHAIRIN ZULAIHAN BINTI BADRUL HISHAM", "AZIMA BINTI MAT ZIN @ ISMAIL", "AZIZAH BINTI MOHAMMED", "AZMAN BIN OTHMAN", "DINITA A/P MUNIANDY", "EMIL NORULHUDA BINTI AMIRUDDIN", "FAIZA BINTI HASBULLAH", "FAIZAH BINTI IBRAHIM", "FARAWAHIDA BINTI MOHD SAFFUAN", "FARIDATUL AKMAAR BINTI MAT SAID", "FATIN FARHANA BINTI AMINUDDIN", "HAFIZI BIN OMAR", "HARISAH BINTI AWANG", "HARIZ IRFAN BIN HUSSIN PAKRI", "HASMAWATI BINTI OTHMAN", "HAZRAH BINTI MOHAMAD", "IRDINA AFIQAH BINTI ISMAIL", "IRMA AZNITA BINTI KAMBALI", "KANG CHIN KOAT", "KASUMMA BINTI PANDAK KAMAL", "MARYANI BINTI DRAMAN", "MAWADDAH HUDA BINTI MOHD AFFANDI", "MAZILA HAZLIN BINTI ABD MAJIT", "MOHAMAD MUNIR BIN ZAINUN", "MOHAMED SYAKIR BIN MD TAHIR", "MOHD SHAMILULHAYAT BIN MOHD ASRI", "MUHAMMAD AKASYAH SAIDON", "MUHAMMAD IRFAN WAZIF BIN MOHD NIZAM", "NADIAH BINTI IDRIS", "NAIM AISAMUDDIN BIN ABDUL RAZAK", "NAZIMATUL AMANI BINTI RAMLI", "NIK HAZIMAN BIN CHE DAUD", "NIK NUR LIYANA BINTI NIK FAUZI", "NITHILA A/P JAKANATHAN", "NOOR AZIZAH BINTI MD BAHARUDDIN", "NORAIDA BINTI MUSTAPHA", "NORAMANI BINTI MAT NOR", "NORMA BINTI ISMAIL", "NORUL HUDA BINTI JAMIN", "NOUR EZIEZAH BINTI MAZMAN", "NUR FATHIN BINTI ZAKI", "NUR SYAFIQAH BINTI ZAHIRUDDIN", "NUR ZURIYATIE BINTI AZIZ", "NURUL HAZIQAH BINTI RAMLI", "NURUL ULYA BINTI NORDIN", "PIRAKAS A/L SHANGAR", "ROHAIZA BINTI RAZALI", "ROSNAH BINTI JANTAN", "RUBINA BINTI RAMLI", "SAHARINA BINTI ABDULLAH", "SITI HAWA BINTI MAT YAJID", "SITI MASHITAH BINTI MOHD ASRI", "SITI NORASYIKIN BINTI ABDULLAH", "SITI NUR DIANA BINTI MOHAMAD NASIR", "SULAIMAN BIN HASSAN", "SUZILA BINTI MOHD NOR", "TG IHTIFAZUDDIN BIN TG IBRAHIM", "UMI NUR HANIRA BINTI ISMAIL", "WAN FAIRIS BIN A. KAMAR", "ZABIDI BIN MOHAMMAD", "ZANIRAH BINTI A. BAKAR"];
 
     window.onload = async function() {
-        checkAutoLock(); 
+        checkStatus();
 
         if(localStorage.getItem('skbtho2_submitted') === 'true') {
             document.getElementById('formSection').classList.add('hidden');
@@ -78,46 +74,43 @@
                 if(namesDone.includes(nama)) opt.className = 'done';
                 select.appendChild(opt);
             });
-        } catch(e) {
-            console.log("Names load error");
-        }
+        } catch(e) { console.log("Load error"); }
     }
 
-    function checkAutoLock() {
+    function checkStatus() {
         const now = new Date();
-        const hour = now.getHours();
-        const minutes = now.getMinutes();
-        const currentTime = hour + (minutes / 60);
-
-        // LOGIK BARU: Dibuka hanya antara jam 15.5 (3:30 PM) dan 18.0 (6:00 PM)
-        const isTimeRange = (currentTime >= 15.5 && currentTime < 18);
+        const currentTime = now.getHours() + (now.getMinutes() / 60);
         
+        // Cek Override Admin Terlebih Dahulu
+        const adminOverride = localStorage.getItem('system_override');
+
+        if (adminOverride === 'AKTIF') {
+            // Jika admin AKTIF, abaikan waktu, jangan tunjuk lockScreen
+            document.getElementById('lockScreen').classList.add('hidden');
+            return; 
+        }
+
+        // Jika tiada override, ikut logik waktu asal
+        const isTimeRange = (currentTime >= 15.5 && currentTime < 18);
         if (!isTimeRange) {
             document.getElementById('lockScreen').classList.remove('hidden');
-            if (currentTime < 15.5) {
-                document.getElementById('lockReason').innerText = "Sistem akan dibuka secara automatik pada jam 3:30 petang.";
-            } else {
-                document.getElementById('lockReason').innerText = "Sistem telah ditutup secara automatik pada jam 6:00 petang.";
-            }
-        } 
-        // Jika Admin kunci manual, ia tetap sekat
-        else if (localStorage.getItem('system_locked_manual') === 'true') {
-            document.getElementById('lockScreen').classList.remove('hidden');
-            document.getElementById('lockReason').innerText = "Sistem telah ditutup secara manual oleh Admin.";
+            document.getElementById('lockReason').innerText = currentTime < 15.5 ? 
+                "Sistem akan dibuka secara automatik jam 3:30 PM." : 
+                "Sistem telah ditutup secara automatik jam 6:00 PM.";
         }
     }
 
     function adminControl() {
         const pass = prompt("PASSCODE ADMIN:");
         if(pass === "KOKU4055") {
-            const cmd = prompt("TAIP 'AKTIF' UNTUK BUKA\nTAIP 'NYAHAKTIF' UNTUK TUTUP");
+            const cmd = prompt("TAIP 'AKTIF' UNTUK BUKA (OVERRIDE WAKTU)\nTAIP 'NYAHAKTIF' UNTUK KEMBALI KEPADA AUTO-LOCK");
             if(cmd && cmd.toUpperCase() === 'AKTIF') {
-                localStorage.setItem('system_locked_manual', 'false');
-                alert("SISTEM DIAKTIFKAN (Status auto-lock waktu tetap berjalan).");
+                localStorage.setItem('system_override', 'AKTIF');
+                alert("OVERRIDE BERJAYA: Sistem dibuka tanpa mengira waktu.");
                 location.reload();
             } else if(cmd && cmd.toUpperCase() === 'NYAHAKTIF') {
-                localStorage.setItem('system_locked_manual', 'true');
-                alert("SISTEM DINYAHAKTIFKAN.");
+                localStorage.setItem('system_override', 'NYAHAKTIF');
+                alert("SISTEM KEMBALI KEPADA JADUAL AUTO (3:30PM - 6:00PM).");
                 location.reload();
             }
         } else if(pass !== null) { alert("SALAH!"); }
@@ -126,11 +119,9 @@
     function detectLocation() {
         navigator.geolocation.getCurrentPosition((pos) => {
             const dist = calculateDistance(3.023221, 101.761705, pos.coords.latitude, pos.coords.longitude);
-            document.getElementById('distanceWrapper').classList.remove('hidden');
-            document.getElementById('infoJarak').innerText = "JARAK: " + Math.round(dist) + " METER";
             if (dist <= 500) { document.getElementById('inBtn').disabled = false; alert("LOKASI DISAHKAN!"); }
-            else { alert("ANDA DI LUAR KAWASAN!"); }
-        }, () => alert("Sila benarkan akses GPS."), { enableHighAccuracy: true });
+            else { alert("DI LUAR KAWASAN!"); }
+        }, () => alert("Sila benarkan GPS."), { enableHighAccuracy: true });
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
