@@ -9,19 +9,18 @@
     <style>
         body { font-family: 'Poppins', sans-serif; background-color: #fef2f2; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .canva-card { background: white; width: 100%; max-width: 400px; padding: 40px 25px; border-radius: 35px; box-shadow: 0 25px 50px -12px rgba(220, 38, 38, 0.15); text-align: center; border-top: 10px solid #dc2626; }
-        .logo-img { width: 130px; margin: 0 auto 20px auto; display: block; }
+        .logo-img { width: 120px; margin: 0 auto 20px auto; display: block; }
         .input-style { width: 100%; padding: 14px; border: 2px solid #fee2e2; border-radius: 15px; margin-bottom: 20px; text-transform: uppercase; text-align: center; font-weight: 600; }
         .btn-detect { background-color: #4b5563; color: white; padding: 15px; border-radius: 15px; width: 100%; font-weight: 600; margin-bottom: 12px; }
         .btn-clockin { background-color: #dc2626; color: white; padding: 18px; border-radius: 15px; width: 100%; font-weight: 700; box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.4); }
         .btn-clockin:disabled { background-color: #fca5a5; opacity: 0.7; cursor: not-allowed; }
-        .btn-view { border: 2px solid #dc2626; color: #dc2626; padding: 12px; border-radius: 15px; width: 100%; font-weight: 600; margin-top: 20px; display: block; }
     </style>
 </head>
 <body>
 
 <div class="canva-card">
     <img src="https://imgur.com/DLy3jZn.png" class="logo-img">
-    <h1 class="text-xl font-bold text-gray-800">Clock In Kokurikulum</h1>
+    <h1 class="text-xl font-bold text-gray-800 leading-tight">Clock In Kokurikulum</h1>
     <p class="text-red-600 font-bold text-sm mb-6 uppercase">SK Bandar Tun Hussein Onn 2</p>
 
     <div class="text-left">
@@ -32,37 +31,39 @@
     <button id="detectBtn" class="btn-detect" onclick="detectLocation()">🔍 SAHKAN LOKASI SAYA</button>
     <button id="inBtn" class="btn-clockin" onclick="saveRecord()" disabled>CLOCK IN</button>
     
-    <a href="https://docs.google.com/spreadsheets/d/1ojyxAPba38LEElc6o_CzlnkcAgI3DB-XxJAchg0bBEo/edit?usp=sharing" target="_blank" class="btn-view">📋 LIHAT REKOD</a>
-
     <div id="distanceWrapper" class="hidden mt-4 p-3 bg-red-50 rounded-xl">
         <p id="infoJarak" class="text-xs text-red-700 font-bold italic"></p>
     </div>
+    <p class="mt-4 text-[10px] text-gray-400">ID Peranti: <span id="devIdDisplay">...</span></p>
 </div>
 
 <script>
-    // URL Web App Terbaru Anda
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxBWkKJkO-6oqHys7w3pvrhjf_299Cqvw0sy3OhWytjbSzXyYMQK7_X6ZTOYxSgC2Tc/exec";
-    
     const SCHOOL_LAT = 3.023221;
     const SCHOOL_LNG = 101.761705;
     const ALLOWED_RADIUS = 500;
 
+    // 1. Fungsi Jana/Ambil ID Peranti Unik
+    let deviceId = localStorage.getItem('skbtho2_dev_id');
+    if (!deviceId) {
+        deviceId = 'DEV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        localStorage.setItem('skbtho2_dev_id', deviceId);
+    }
+    document.getElementById('devIdDisplay').innerText = deviceId;
+
     function detectLocation() {
-        const info = document.getElementById('infoJarak');
-        const wrapper = document.getElementById('distanceWrapper');
-        
         navigator.geolocation.getCurrentPosition((pos) => {
             const dist = calculateDistance(SCHOOL_LAT, SCHOOL_LNG, pos.coords.latitude, pos.coords.longitude);
-            wrapper.classList.remove('hidden');
-            info.innerText = "JARAK ANDA: " + Math.round(dist) + " METER";
+            document.getElementById('distanceWrapper').classList.remove('hidden');
+            document.getElementById('infoJarak').innerText = "JARAK ANDA: " + Math.round(dist) + " METER";
             
             if (dist <= ALLOWED_RADIUS) {
                 document.getElementById('inBtn').disabled = false;
-                alert("LOKASI DISAHKAN! Anda boleh Clock In.");
+                alert("LOKASI DISAHKAN!");
             } else {
-                alert("ANDA DI LUAR KAWASAN (Radius 500m). Jarak semasa: " + Math.round(dist) + "m");
+                alert("DI LUAR KAWASAN!");
             }
-        }, () => alert("Sila benarkan akses GPS pada telefon anda."), { enableHighAccuracy: true });
+        }, () => alert("Sila aktifkan GPS."), { enableHighAccuracy: true });
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -77,26 +78,31 @@
 
     function saveRecord() {
         const nama = document.getElementById('teacherName').value;
-        const btn = document.getElementById('inBtn');
-        if (!nama) return alert("Sila taip nama dahulu!");
+        if (!nama) return alert("Sila isi nama!");
 
-        btn.innerText = "MENGHANTAR...";
-        btn.disabled = true;
+        // 2. Semakan Sekat Nama Berbeza pada Telefon Sama
+        const savedName = localStorage.getItem('skbtho2_last_name');
+        if (savedName && savedName !== nama) {
+            const confirmChange = confirm("Peranti ini sebelum ini digunakan oleh " + savedName + ". Adakah anda pasti ini peranti anda?");
+            if (!confirmChange) return;
+        }
+
+        document.getElementById('inBtn').innerText = "MENGHANTAR...";
+        document.getElementById('inBtn').disabled = true;
 
         fetch(WEB_APP_URL, {
             method: "POST",
             mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ nama: nama, status: "CLOCK-IN KOKO" })
+            body: JSON.stringify({ 
+                nama: nama, 
+                status: "CLOCK-IN KOKO",
+                deviceId: deviceId 
+            })
         })
         .then(() => {
-            alert("BERJAYA! Rekod kehadiran " + nama + " telah dihantar.");
+            localStorage.setItem('skbtho2_last_name', nama);
+            alert("BERJAYA! ID Peranti anda direkodkan.");
             location.reload();
-        })
-        .catch((err) => {
-            alert("Ralat penghantaran. Cuba lagi.");
-            btn.disabled = false;
-            btn.innerText = "CLOCK IN";
         });
     }
 </script>
