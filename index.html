@@ -9,19 +9,13 @@
     <style>
         body { font-family: 'Poppins', sans-serif; background-color: #fef2f2; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .canva-card { background: white; width: 100%; max-width: 450px; padding: 30px 25px; border-radius: 35px; box-shadow: 0 25px 50px -12px rgba(220, 38, 38, 0.15); text-align: center; border-top: 10px solid #dc2626; position: relative; overflow: visible; }
-        
-        /* Logo diletakkan di Z-INDEX tinggi supaya sentiasa di atas */
         .logo-container { position: relative; z-index: 110; cursor: pointer; user-select: none; }
         .logo-img { width: 100px; margin: 0 auto 15px auto; display: block; -webkit-user-drag: none; }
-        
         .select-style { width: 100%; padding: 14px; border: 2px solid #fee2e2; border-radius: 15px; margin-bottom: 20px; font-weight: 600; background-color: white; color: #374151; appearance: none; }
         .select-style option.done { background-color: #d1fae5 !important; color: #065f46 !important; } 
-        
         .btn-detect { background-color: #4b5563; color: white; padding: 15px; border-radius: 15px; width: 100%; font-weight: 600; margin-bottom: 12px; }
         .btn-clockin { background-color: #dc2626; color: white; padding: 18px; border-radius: 15px; width: 100%; font-weight: 700; box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.4); }
         .btn-clockin:disabled { background-color: #fca5a5; opacity: 0.7; }
-        
-        /* Lock Overlay di bawah logo (z-index 100) */
         .lock-overlay { background: rgba(255,255,255,0.98); border-radius: 35px; position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; padding: 20px; padding-top: 120px; }
     </style>
 </head>
@@ -45,7 +39,7 @@
         <div class="text-left">
             <label class="text-xs font-bold text-gray-500 uppercase ml-2">Pilih Nama Anda</label>
             <select id="teacherName" class="select-style">
-                <option value="">-- MEMUAT NAMA... --</option>
+                <option value="">-- SILA TUNGGU... --</option>
             </select>
         </div>
         <button id="detectBtn" class="btn-detect" onclick="detectLocation()">🔍 SAHKAN LOKASI SAYA</button>
@@ -53,13 +47,14 @@
     </div>
 
     <div id="blockSection" class="hidden py-4 text-green-700 font-bold bg-green-50 rounded-2xl border border-green-100 mt-4 text-sm">
-        ✅ REKOD PERANTI INI TELAH DIHANTAR.
+        ✅ REKOD ANDA TELAH DIHANTAR.
     </div>
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxrJAvYuqsYEyCjjOYI75DYa5jGs2MwYr_ad7ms1M8jQYd4Ca64CkQPi_Agf1-v_590/exec";
-    const senaraiGuru = ["ABDUL KAHAR BIN AWANG SEMAN", "AINA ATHIRAH BINTI AHMAD SENARI", "AMIRAH BINTI MOHD ALWI", "AMINUDDIN BIN ISMAIL", "ARINAWATI BINTI MOHD YAH", "AWATIF BINTI MD YUSOP", "AZHAIRIN ZULAIHAN BINTI BADRUL HISHAM", "AZIMA BINTI MAT ZIN @ ISMAIL", "AZIZAH BINTI MOHAMMED", "AZMAN BIN OTHMAN", "DINITA A/P MUNIANDY", "EMIL NORULHUDA BINTI AMIRUDDIN", "FAIZA BINTI HASBULLAH", "FAIZAH BINTI IBRAHIM", "FARAWAHIDA BINTI MOHD SAFFUAN", "FARIDATUL AKMAAR BINTI MAT SAID", "FATIN FARHANA BINTI AMINUDDIN", "HAFIZI BIN OMAR", "HARISAH BINTI AWANG", "HARIZ IRFAN BIN HUSSIN PAKRI", "HASMAWATI BINTI OTHMAN", "HAZRAH BINTI MOHAMAD", "IRDINA AFIQAH BINTI ISMAIL", "IRMA AZNITA BINTI KAMBALI", "KANG CHIN KOAT", "KASUMMA BINTI PANDAK KAMAL", "MARYANI BINTI DRAMAN", "MAWADDAH HUDA BINTI MOHD AFFANDI", "MAZILA HAZLIN BINTI ABD MAJIT", "MOHAMAD MUNIR BIN ZAINUN", "MOHAMED SYAKIR BIN MD TAHIR", "MOHD SHAMILULHAYAT BIN MOHD ASRI", "MUHAMMAD AKASYAH SAIDON", "MUHAMMAD IRFAN WAZIF BIN MOHD NIZAM", "NADIAH BINTI IDRIS", "NAIM AISAMUDDIN BIN ABDUL RAZAK", "NAZIMATUL AMANI BINTI RAMLI", "NIK HAZIMAN BIN CHE DAUD", "NIK NUR LIYANA BINTI NIK FAUZI", "NITHILA A/P JAKANATHAN", "NOOR AZIZAH BINTI MD BAHARUDDIN", "NORAIDA BINTI MUSTAPHA", "NORAMANI BINTI MAT NOR", "NORMA BINTI ISMAIL", "NORUL HUDA BINTI JAMIN", "NOUR EZIEZAH BINTI MAZMAN", "NUR FATHIN BINTI ZAKI", "NUR SYAFIQAH BINTI ZAHIRUDDIN", "NUR ZURIYATIE BINTI AZIZ", "NURUL HAZIQAH BINTI RAMLI", "NURUL ULYA BINTI NORDIN", "PIRAKAS A/L SHANGAR", "ROHAIZA BINTI RAZALI", "ROSNAH BINTI JANTAN", "RUBINA BINTI RAMLI", "SAHARINA BINTI ABDULLAH", "SITI HAWA BINTI MAT YAJID", "SITI MASHITAH BINTI MOHD ASRI", "SITI NORASYIKIN BINTI ABDULLAH", "SITI NUR DIANA BINTI MOHAMAD NASIR", "SULAIMAN BIN HASSAN", "SUZILA BINTI MOHD NOR", "TG IHTIFAZUDDIN BIN TG IBRAHIM", "UMI NUR HANIRA BINTI ISMAIL", "WAN FAIRIS BIN A. KAMAR", "ZABIDI BIN MOHAMMAD", "ZANIRAH BINTI A. BAKAR"];
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxiTBPumXl_e9FQPgPw4F8llcSLaSDbyZxE6G7eC3iEguegQbkJQm_MIwFmsOckcrTd/exec";
+    
+    const senaraiGuru = ["ABDUL KAHAR BIN AWANG SEMAN", "AINA ATHIRAH BINTI AHMAD SENARI", "AMIRAH BINTI MOHD ALWI", "AMINUDDIN BIN ISMAIL", "ARINAWATI BINTI MOHD YAH", "AWATIF BINTI MD YUSOP", "AZHAIRIN ZULAIHAN BINTI BADRUL HISHAM", "AZIMA BINTI MAT ZIN @ ISMAIL", "AZIZAH BINTI MOHAMMED", "AZIZAH BINTI MOHAMMED", "AZMAN BIN OTHMAN", "DINITA A/P MUNIANDY", "EMIL NORULHUDA BINTI AMIRUDDIN", "FAIZA BINTI HASBULLAH", "FAIZAH BINTI IBRAHIM", "FARAWAHIDA BINTI MOHD SAFFUAN", "FARIDATUL AKMAAR BINTI MAT SAID", "FATIN FARHANA BINTI AMINUDDIN", "HAFIZI BIN OMAR", "HARISAH BINTI AWANG", "HARIZ IRFAN BIN HUSSIN PAKRI", "HASMAWATI BINTI OTHMAN", "HAZRAH BINTI MOHAMAD", "IRDINA AFIQAH BINTI ISMAIL", "IRMA AZNITA BINTI KAMBALI", "KANG CHIN KOAT", "KASUMMA BINTI PANDAK KAMAL", "MARYANI BINTI DRAMAN", "MAWADDAH HUDA BINTI MOHD AFFANDI", "MAZILA HAZLIN BINTI ABD MAJIT", "MOHAMAD MUNIR BIN ZAINUN", "MOHAMED SYAKIR BIN MD TAHIR", "MOHD SHAMILULHAYAT BIN MOHD ASRI", "MUHAMMAD AKASYAH SAIDON", "MUHAMMAD IRFAN WAZIF BIN MOHD NIZAM", "NADIAH BINTI IDRIS", "NAIM AISAMUDDIN BIN ABDUL RAZAK", "NAZIMATUL AMANI BINTI RAMLI", "NIK HAZIMAN BIN CHE DAUD", "NIK NUR LIYANA BINTI NIK FAUZI", "NITHILA A/P JAKANATHAN", "NOOR AZIZAH BINTI MD BAHARUDDIN", "NORAIDA BINTI MUSTAPHA", "NORAMANI BINTI MAT NOR", "NORMA BINTI ISMAIL", "NORUL HUDA BINTI JAMIN", "NOUR EZIEZAH BINTI MAZMAN", "NUR FATHIN BINTI ZAKI", "NUR SYAFIQAH BINTI ZAHIRUDDIN", "NUR ZURIYATIE BINTI AZIZ", "NURUL HAZIQAH BINTI RAMLI", "NURUL ULYA BINTI NORDIN", "PIRAKAS A/L SHANGAR", "ROHAIZA BINTI RAZALI", "ROSNAH BINTI JANTAN", "RUBINA BINTI RAMLI", "SAHARINA BINTI ABDULLAH", "SITI HAWA BINTI MAT YAJID", "SITI MASHITAH BINTI MOHD ASRI", "SITI NORASYIKIN BINTI ABDULLAH", "SITI NUR DIANA BINTI MOHAMAD NASIR", "SULAIMAN BIN HASSAN", "SUZILA BINTI MOHD NOR", "TG IHTIFAZUDDIN BIN TG IBRAHIM", "UMI NUR HANIRA BINTI ISMAIL", "WAN FAIRIS BIN A. KAMAR", "ZABIDI BIN MOHAMMAD", "ZANIRAH BINTI A. BAKAR"];
 
     let clickCount = 0;
     let clickTimer;
@@ -79,16 +74,31 @@
         if(localStorage.getItem('manual_lock') === 'true') {
             document.getElementById('lockScreen').classList.remove('hidden');
         }
-
         if(localStorage.getItem('skbtho2_submitted') === 'true') {
             document.getElementById('formSection').classList.add('hidden');
             document.getElementById('blockSection').classList.remove('hidden');
         }
 
+        const select = document.getElementById('teacherName');
+        const populateOriginalList = () => {
+            select.innerHTML = '<option value="">-- SILA PILIH NAMA --</option>';
+            senaraiGuru.sort().forEach(nama => {
+                let opt = document.createElement('option');
+                opt.value = nama;
+                opt.innerHTML = nama;
+                select.appendChild(opt);
+            });
+        };
+
+        // Cuba fetch data dari Google Sheet
         try {
-            const resp = await fetch(WEB_APP_URL);
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), 5000); // Timeout 5 saat
+
+            const resp = await fetch(WEB_APP_URL, { signal: controller.signal });
+            clearTimeout(id);
+            
             const namesDone = await resp.json();
-            const select = document.getElementById('teacherName');
             select.innerHTML = '<option value="">-- SILA PILIH NAMA --</option>';
             senaraiGuru.sort().forEach(nama => {
                 let opt = document.createElement('option');
@@ -97,24 +107,20 @@
                 if(namesDone.includes(nama)) opt.className = 'done';
                 select.appendChild(opt);
             });
-        } catch(e) { console.log("Load error"); }
+        } catch(e) {
+            console.log("Fetch failed, using local list.");
+            populateOriginalList();
+        }
     }
 
     function adminControl() {
-        const pass = prompt("SILA MASUKKAN PASSCODE ADMIN:");
+        const pass = prompt("MASUKKAN PASSCODE ADMIN:");
         if(pass === "KOKU4055") {
-            const isCurrentlyLocked = localStorage.getItem('manual_lock') === 'true';
-            if(isCurrentlyLocked) {
-                localStorage.setItem('manual_lock', 'false');
-                alert("SISTEM BERJAYA DIBUKA (UNLOCKED)");
-            } else {
-                localStorage.setItem('manual_lock', 'true');
-                alert("SISTEM BERJAYA DIKUNCI (LOCKED)");
-            }
+            const isLocked = localStorage.getItem('manual_lock') === 'true';
+            localStorage.setItem('manual_lock', !isLocked);
+            alert(isLocked ? "SISTEM DIBUKA!" : "SISTEM DIKUNCI!");
             location.reload();
-        } else if(pass !== null) { 
-            alert("PASSCODE SALAH!"); 
-        }
+        } else if(pass !== null) { alert("PASSCODE SALAH!"); }
     }
 
     function detectLocation() {
@@ -141,7 +147,7 @@
         fetch(WEB_APP_URL, {
             method: "POST",
             mode: "no-cors",
-            body: JSON.stringify({ nama: nama, status: "CLOCK-IN KOKO", deviceId: localStorage.getItem('skbtho2_dev_id') || 'DEV' })
+            body: JSON.stringify({ nama: nama, status: "CLOCK-IN KOKO", deviceId: "DEV-SKBTHO2" })
         }).then(() => {
             localStorage.setItem('skbtho2_submitted', 'true');
             alert("BERJAYA!");
