@@ -22,68 +22,79 @@
             background: white;
             width: 100%;
             max-width: 400px;
-            padding: 35px 25px;
-            border-radius: 30px;
-            box-shadow: 0 20px 25px -5px rgba(220, 38, 38, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            padding: 40px 25px;
+            border-radius: 35px;
+            box-shadow: 0 25px 50px -12px rgba(220, 38, 38, 0.15);
             text-align: center;
-            border-top: 8px solid #dc2626;
+            border-top: 10px solid #dc2626;
         }
         .logo-img {
-            width: 90px;
+            width: 130px;
             height: auto;
-            margin: 0 auto 15px auto;
+            margin: 0 auto 20px auto;
             display: block;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
         }
         .input-style {
             width: 100%;
-            padding: 12px 15px;
-            border: 1.5px solid #fee2e2;
-            border-radius: 12px;
+            padding: 14px 15px;
+            border: 2px solid #fee2e2;
+            border-radius: 15px;
             margin-top: 8px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             font-size: 16px;
             text-transform: uppercase;
-        }
-        .input-style:focus {
-            border-color: #dc2626;
-            outline: none;
-            ring: 2px;
-            ring-color: #fecaca;
+            text-align: center;
+            font-weight: 600;
         }
         .btn-detect {
             background-color: #4b5563;
             color: white;
-            padding: 14px;
-            border-radius: 12px;
+            padding: 15px;
+            border-radius: 15px;
             width: 100%;
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             cursor: pointer;
         }
         .btn-clockin {
             background-color: #dc2626;
             color: white;
-            padding: 16px;
-            border-radius: 12px;
+            padding: 18px;
+            border-radius: 15px;
             width: 100%;
             font-weight: 700;
-            letter-spacing: 0.5px;
-            box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.3);
+            margin-bottom: 12px;
+            box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.4);
             cursor: pointer;
         }
         .btn-clockin:disabled {
             background-color: #fca5a5;
-            box-shadow: none;
             cursor: not-allowed;
-            opacity: 0.6;
+            opacity: 0.7;
+        }
+        .btn-view {
+            background-color: white;
+            color: #dc2626;
+            border: 2px solid #dc2626;
+            padding: 12px;
+            border-radius: 15px;
+            width: 100%;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         .status-pill {
-            padding: 8px 16px;
+            padding: 10px 20px;
             border-radius: 100px;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 700;
             display: inline-block;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
     </style>
 </head>
@@ -94,35 +105,40 @@
 
     <div class="mb-6">
         <h1 class="text-xl font-bold text-gray-800 leading-tight">Pengesahan Lokasi Clock In Kokurikulum</h1>
-        <p class="text-red-600 font-medium text-sm mt-1">SK Bandar Tun Hussein Onn 2</p>
+        <p class="text-red-600 font-bold text-sm mt-1">SK BANDAR TUN HUSSEIN ONN 2</p>
     </div>
 
-    <div id="statusBanner" class="status-pill bg-gray-100 text-gray-500 border border-gray-200">
-        Sila sahkan lokasi anda
+    <div id="statusBanner" class="status-pill bg-gray-100 text-gray-400 border border-gray-200">
+        SILA SAHKAN LOKASI
     </div>
 
-    <div class="text-left">
-        <label class="text-xs font-bold text-gray-400 uppercase ml-1">Nama Penuh Guru</label>
-        <input type="text" id="teacherName" class="input-style" placeholder="NAMA ANDA" oninput="this.value = this.value.toUpperCase()">
+    <div class="text-left mb-4">
+        <label class="text-xs font-bold text-gray-500 uppercase ml-2">Nama Penuh Guru</label>
+        <input type="text" id="teacherName" class="input-style" placeholder="TAIP NAMA ANDA" oninput="this.value = this.value.toUpperCase()">
     </div>
 
     <button id="detectBtn" class="btn-detect" onclick="detectLocation()">
-        🔍 Sahkan Lokasi Saya
+        🔍 SAHKAN LOKASI SAYA
     </button>
     
     <button id="inBtn" class="btn-clockin" onclick="saveRecord()" disabled>
         CLOCK IN
     </button>
 
-    <div id="distanceWrapper" class="hidden mt-6 p-3 bg-red-50 rounded-xl border border-red-100">
-        <p id="infoJarak" class="text-[11px] text-red-700 font-medium"></p>
+    <hr class="my-4 border-gray-100">
+
+    <button class="btn-view" onclick="window.open('https://docs.google.com/spreadsheets/d/1ojyxAPba38LEElc6o_CzlnkcAgI3DB-XxJAchg0bBEo/edit?usp=sharing', '_blank')">
+        📋 LIHAT REKOD KEHADIRAN
+    </button>
+
+    <div id="distanceWrapper" class="hidden mt-6 p-4 bg-red-50 rounded-2xl border border-red-100">
+        <p id="infoJarak" class="text-[12px] text-red-700 font-bold italic"></p>
     </div>
 </div>
 
 <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby36C50CxeYbp3_hXAgOBxOeXHgUhZkfmSvS0n1YFs/exec";
 
-    // KOORDINAT SEKOLAH
     const SCHOOL_LAT = 3.052485;
     const SCHOOL_LNG = 101.754269;
     const ALLOWED_RADIUS = 100;
@@ -132,31 +148,25 @@
         const inBtn = document.getElementById('inBtn');
         const distWrap = document.getElementById('distanceWrapper');
         
-        banner.innerText = "⌛ Mengesan GPS...";
+        banner.innerText = "⌛ MENGESAN GPS...";
         
-        if (!navigator.geolocation) {
-            alert("GPS tidak disokong pada peranti ini.");
-            return;
-        }
-
         navigator.geolocation.getCurrentPosition((pos) => {
             const distance = calculateDistance(SCHOOL_LAT, SCHOOL_LNG, pos.coords.latitude, pos.coords.longitude);
-            
             distWrap.classList.remove('hidden');
-            document.getElementById('infoJarak').innerText = "Jarak: " + Math.round(distance) + " meter dari sekolah.";
+            document.getElementById('infoJarak').innerText = "JARAK: " + Math.round(distance) + " METER DARI SEKOLAH";
 
             if (distance <= ALLOWED_RADIUS) {
-                banner.innerText = "✅ Lokasi Disahkan";
-                banner.className = "status-pill bg-green-100 text-green-600 border border-green-200";
+                banner.innerText = "✅ LOKASI DISAHKAN";
+                banner.className = "status-pill bg-green-100 text-green-700 border border-green-200";
                 inBtn.disabled = false;
             } else {
-                banner.innerText = "❌ Luar Kawasan";
-                banner.className = "status-pill bg-red-100 text-red-600 border border-red-200";
+                banner.innerText = "❌ LUAR KAWASAN";
+                banner.className = "status-pill bg-red-100 text-red-700 border border-red-200";
                 inBtn.disabled = true;
-                alert("Anda berada di luar kawasan sekolah (" + Math.round(distance) + "m).");
+                alert("Anda di luar kawasan (" + Math.round(distance) + "m).");
             }
         }, (err) => {
-            alert("Ralat GPS: Sila benarkan akses lokasi pada telefon anda.");
+            alert("Sila aktifkan GPS.");
         }, { enableHighAccuracy: true });
     }
 
@@ -173,8 +183,7 @@
     function saveRecord() {
         const nama = document.getElementById('teacherName').value;
         const btn = document.getElementById('inBtn');
-
-        if (!nama) return alert("Sila masukkan nama anda.");
+        if (!nama) return alert("Sila isi nama!");
 
         btn.disabled = true;
         btn.innerText = "MENGHANTAR...";
@@ -185,11 +194,11 @@
             body: JSON.stringify({ nama: nama, status: "CLOCK-IN KOKO" })
         })
         .then(() => {
-            alert("Berjaya! Kehadiran anda telah direkodkan.");
+            alert("BERJAYA! Rekod dihantar.");
             location.reload();
         })
         .catch(() => {
-            alert("Ralat penghantaran.");
+            alert("Ralat.");
             btn.disabled = false;
         });
     }
