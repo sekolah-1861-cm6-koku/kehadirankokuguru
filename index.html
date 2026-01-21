@@ -11,9 +11,9 @@
             font-family: 'Poppins', sans-serif; 
             background: linear-gradient(135deg, #740202 0%, #dc2626 100%); 
             min-height: 100vh; display: flex; align-items: center; justify-content: center; 
-            padding: 20px; overflow: hidden; position: relative;
+            padding: 20px; overflow-x: hidden; position: relative;
         }
-        .cubes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; }
+        .cubes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
         .cube { position: absolute; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); animation: animate 25s linear infinite; bottom: -150px; }
         @keyframes animate { 0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; } 100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; } }
         .canva-card { 
@@ -21,8 +21,8 @@
             padding: 35px 20px; border-radius: 40px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); 
             text-align: center; position: relative; z-index: 10;
         }
-        @keyframes logoPulse { 0%, 100% { transform: scale(1); filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2)); } 50% { transform: scale(1.08); filter: drop-shadow(0 10px 25px rgba(220, 38, 38, 0.5)); } }
-        .logo-img { width: 85px; margin: 0 auto 15px auto; display: block; animation: logoPulse 2.5s ease-in-out infinite; }
+        .logo-img { width: 85px; margin: 0 auto 15px auto; display: block; cursor: pointer; transition: transform 0.3s; }
+        .logo-img:active { transform: scale(0.9); }
         .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
         .status-box { border: 3px solid #f3f4f6; padding: 15px 5px; border-radius: 20px; cursor: pointer; transition: all 0.3s; background: white; }
         .status-box.active-hadir { border-color: #10b981; background: #ecfdf5; transform: translateY(-5px); }
@@ -37,7 +37,6 @@
 
 <div class="cubes">
     <div class="cube" style="left: 25%; width: 80px; height: 80px; animation-delay: 0s;"></div>
-    <div class="cube" style="left: 10%; width: 20px; height: 20px; animation-delay: 2s;"></div>
     <div class="cube" style="left: 70%; width: 60px; height: 60px; animation-delay: 4s;"></div>
 </div>
 
@@ -46,12 +45,10 @@
         <img src="https://imgur.com/DLy3jZn.png" class="logo-img">
     </div>
 
-    <h1 class="font-bold text-gray-800 uppercase mb-1" 
-        style="font-size: clamp(12px, 4vw, 18px); letter-spacing: 0.02em; white-space: nowrap;">
+    <h1 class="font-bold text-gray-800 uppercase mb-1" style="font-size: clamp(12px, 4vw, 18px);">
         SISTEM KEHADIRAN KOKURIKULUM GURU
     </h1>
-    <p class="text-red-600 font-bold tracking-[0.2em] uppercase" 
-       style="font-size: clamp(9px, 2.5vw, 11px); margin-bottom: 30px;">
+    <p class="text-red-600 font-bold tracking-[0.2em] uppercase" style="font-size: clamp(9px, 2.5vw, 11px); margin-bottom: 30px;">
         SK BANDAR TUN HUSSEIN ONN 2
     </p>
 
@@ -82,17 +79,59 @@
     <div id="blockSection" class="hidden py-10">
         <div class="text-6xl mb-4">🎉</div>
         <h2 class="text-green-600 font-bold text-xl uppercase">Berjaya!</h2>
-        <p class="text-gray-500 text-sm mt-2">Rekod anda telah dihantar.</p>
+        <p class="text-gray-500 text-sm mt-2">Rekod anda telah dihantar untuk hari ini.</p>
     </div>
 </div>
 
 <script>
+    // MASUKKAN URL WEB APP ANDA
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzdI4aGxMenu6kSeXKRYABJFJ_3dWEeqVYkXY6_cjZ3MrPKpaIdnPScRzYnZpsWQTfS/exec";
-    const dingSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+    
     let selectedStatus = "HADIR";
     let userLat = ""; let userLng = ""; let clickCount = 0; let clickTimer;
 
     const senaraiGuru = ["ABDUL KAHAR BIN AWANG SEMAN", "AINA ATHIRAH BINTI AHMAD SENARI", "AMIRAH BINTI MOHD ALWI", "AMINUDDIN BIN ISMAIL", "ARINAWATI BINTI MOHD YAH", "AWATIF BINTI MD YUSOP", "AZHAIRIN ZULAIHAN BINTI BADRUL HISHAM", "AZIMA BINTI MAT ZIN @ ISMAIL", "AZIZAH BINTI MOHAMMED", "AZMAN BIN OTHMAN", "DINITA A/P MUNIANDY", "EMIL NORULHUDA BINTI AMIRUDDIN", "FAIZA BINTI HASBULLAH", "FAIZAH BINTI IBRAHIM", "FARAWAHIDA BINTI MOHD SAFFUAN", "FARIDATUL AKMAAR BINTI MAT SAID", "FATIN FARHANA BINTI AMINUDDIN", "HAFIZI BIN OMAR", "HARISAH BINTI AWANG", "HARIZ IRFAN BIN HUSSIN PAKRI", "HASMAWATI BINTI OTHMAN", "HAZRAH BINTI MOHAMAD", "IRDINA AFIQAH BINTI ISMAIL", "IRMA AZNITA BINTI KAMBALI", "KANG CHIN KOAT", "KASUMMA BINTI PANDAK KAMAL", "MARYANI BINTI DRAMAN", "MAWADDAH HUDA BINTI MOHD AFFANDI", "MAZILA HAZLIN BINTI ABD MAJIT", "MOHAMAD MUNIR BIN ZAINUN", "MOHAMED SYAKIR BIN MD TAHIR", "MOHD SHAMILULHAYAT BIN MOHD ASRI", "MUHAMMAD AKASYAH SAIDON", "MUHAMMAD IRFAN WAZIF BIN MOHD NIZAM", "NADIAH BINTI IDRIS", "NAIM AISAMUDDIN BIN ABDUL RAZAK", "NAZIMATUL AMANI BINTI RAMLI", "NIK HAZIMAN BIN CHE DAUD", "NIK NUR LIYANA BINTI NIK MOHD FAUZI", "NITHILA A/P JAKANATHAN", "NOOR AZIZAH BINTI MD BAHARUDDIN", "NORAIDA BINTI MUSTAPHA", "NORAMANI BINTI MAT NOR", "NORMA BINTI ISMAIL", "NORUL HUDA BINTI JAMIN", "NOUR EZIEZAH BINTI MAZMAN", "NUR FATHIN BINTI ZAKI", "NUR SYAFIQAH BINTI ZAHIRUDIN", "NUR ZURIYATIE BINTI AZIZ", "NURUL HAZIQAH BINTI RAMLI", "NURUL ULYA BINTI NORDIN", "PIRAKAS A/L SHANGAR", "ROHAIZA BINTI RAZALI", "ROSNAH BINTI JANTAN", "RUBINA BINTI RAMLI", "SAHARINA BINTI ABDULLAH", "SITI HAWA BINTI MAT YAJID", "SITI MASHITAH BINTI MOHD ASRI", "SITI NORASYIKIN BINTI ABDULLAH", "SITI NUR DIANA BINTI MOHAMAD NASIR", "SULAIMAN BIN HASSAN", "SUZILA BINTI MOHD NOR", "TG IHTIFAZUDDIN BIN TG IBRAHIM", "UMI NUR HANIRA BINTI ISMAIL", "WAN FAIRIS BIN A. KAMAR", "ZABIDI BIN MOHAMMAD", "ZANIRAH BINTI A. BAKAR"];
+
+    window.onload = async function() {
+        const select = document.getElementById('teacherName');
+        const today = new Date().toLocaleDateString();
+
+        try {
+            // 1. SEMAK STATUS KUNCI DARI SERVER
+            const statusResp = await fetch(`${WEB_APP_URL}?action=getStatus`);
+            const systemStatus = await statusResp.text();
+            
+            if (systemStatus === "closed") {
+                document.getElementById('formSection').innerHTML = `
+                    <div class="py-10 text-center">
+                        <div class="text-6xl mb-4">🔒</div>
+                        <h2 class="text-red-600 font-bold text-xl uppercase">Sistem Ditutup</h2>
+                        <p class="text-gray-500 text-sm mt-2">Maaf, sesi kehadiran telah ditutup oleh admin.</p>
+                    </div>`;
+                return;
+            }
+
+            // 2. SEMAK JIKA DAH HANTAR HARI INI
+            if(localStorage.getItem('last_submit_date') === today) {
+                document.getElementById('formSection').classList.add('hidden');
+                document.getElementById('blockSection').classList.remove('hidden');
+                return;
+            }
+
+            // 3. MUAT SENARAI GURU & TANDA ✅
+            const resp = await fetch(WEB_APP_URL);
+            const namesDone = await resp.json();
+            select.innerHTML = '<option value="">-- SILA PILIH NAMA --</option>';
+            senaraiGuru.sort().forEach(nama => {
+                let opt = document.createElement('option');
+                opt.value = nama; 
+                opt.innerHTML = namesDone.includes(nama) ? "✅ " + nama : nama;
+                select.appendChild(opt);
+            });
+        } catch(e) {
+            console.log("Error Loading:", e);
+        }
+    }
 
     function selectStatus(val) {
         selectedStatus = val;
@@ -101,43 +140,16 @@
         document.getElementById('inBtn').disabled = true;
     }
 
-    function handleSecretClick() {
-        clickCount++; clearTimeout(clickTimer);
-        if (clickCount === 3) { adminControl(); clickCount = 0; }
-        else { clickTimer = setTimeout(() => { clickCount = 0; }, 500); }
-    }
-
-    window.onload = async function() {
-        const today = new Date().toLocaleDateString();
-        if(localStorage.getItem('manual_lock') === 'true') document.getElementById('lockScreen').classList.remove('hidden');
-        if(localStorage.getItem('last_submit_date') === today) {
-            document.getElementById('formSection').classList.add('hidden');
-            document.getElementById('blockSection').classList.remove('hidden');
-        }
-        const select = document.getElementById('teacherName');
-        try {
-            const resp = await fetch(WEB_APP_URL);
-            const namesDone = await resp.json();
-            select.innerHTML = '<option value="">-- SILA PILIH NAMA --</option>';
-            senaraiGuru.sort().forEach(nama => {
-                let opt = document.createElement('option');
-                opt.value = nama; opt.innerHTML = namesDone.includes(nama) ? "✅ " + nama : nama;
-                select.appendChild(opt);
-            });
-        } catch(e) {
-            select.innerHTML = '<option value="">-- SILA PILIH NAMA --</option>';
-            senaraiGuru.sort().forEach(nama => {
-                let opt = document.createElement('option');
-                opt.value = nama; opt.innerHTML = nama; select.appendChild(opt);
-            });
-        }
-    }
-
     function detectLocation() {
         const schoolLat = 3.052485; const schoolLog = 101.754269;
         navigator.geolocation.getCurrentPosition((pos) => {
             userLat = pos.coords.latitude; userLng = pos.coords.longitude;
-            const dist = calculateDistance(schoolLat, schoolLog, userLat, userLng);
+            const R = 6371e3;
+            const d1 = schoolLat * Math.PI/180; const d2 = userLat * Math.PI/180;
+            const df = (userLat-schoolLat) * Math.PI/180; const dl = (userLng-schoolLog) * Math.PI/180;
+            const a = Math.sin(df/2) * Math.sin(df/2) + Math.cos(d1) * Math.cos(d2) * Math.sin(dl/2) * Math.sin(dl/2);
+            const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
             if (selectedStatus === "HADIR") {
                 if (dist <= 500) { document.getElementById('inBtn').disabled = false; alert("LOKASI DISAHKAN!"); }
                 else { alert("ANDA DI LUAR KAWASAN SEKOLAH!"); }
@@ -147,36 +159,46 @@
         }, () => alert("Sila benarkan akses GPS."), { enableHighAccuracy: true });
     }
 
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371e3;
-        const d1 = lat1 * Math.PI/180; const d2 = lat2 * Math.PI/180;
-        const df = (lat2-lat1) * Math.PI/180; const dl = (lon2-lon1) * Math.PI/180;
-        const a = Math.sin(df/2) * Math.sin(df/2) + Math.cos(d1) * Math.cos(d2) * Math.sin(dl/2) * Math.sin(dl/2);
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    }
-
     function saveRecord() {
         const nama = document.getElementById('teacherName').value;
-        const today = new Date().toLocaleDateString();
         if (!nama) return alert("Sila pilih nama!");
+        
         document.getElementById('inBtn').innerText = "MENGHANTAR...";
         document.getElementById('inBtn').disabled = true;
+
         fetch(WEB_APP_URL, {
-            method: "POST", mode: "no-cors",
-            body: JSON.stringify({ nama: nama, status: selectedStatus, lat: userLat, lng: userLng, deviceId: "DEV-SKBTHO2" })
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify({ 
+                nama: nama, 
+                status: selectedStatus, 
+                lat: userLat, 
+                lng: userLng, 
+                deviceId: "WEB-SKBTHO2" 
+            })
         }).then(() => {
-            dingSound.play().catch(e => console.log(e));
-            localStorage.setItem('last_submit_date', today);
-            setTimeout(() => { alert("KEHADIRAN BERJAYA!"); location.reload(); }, 800);
-        });
+            localStorage.setItem('last_submit_date', new Date().toLocaleDateString());
+            alert("KEHADIRAN BERJAYA!");
+            location.reload();
+        }).catch(err => alert("Ralat Penghantaran: " + err));
+    }
+
+    function handleSecretClick() {
+        clickCount++; clearTimeout(clickTimer);
+        if (clickCount === 3) { adminControl(); clickCount = 0; }
+        else { clickTimer = setTimeout(() => { clickCount = 0; }, 500); }
     }
 
     function adminControl() {
         const pass = prompt("MOD ADMIN:");
         if(pass === "KOKU4055") {
-            const isLocked = localStorage.getItem('manual_lock') === 'true';
-            localStorage.setItem('manual_lock', !isLocked);
-            location.reload();
+            alert("Sila tunggu, menukar status sistem...");
+            fetch(`${WEB_APP_URL}?action=toggle`)
+            .then(res => res.text())
+            .then(result => {
+                alert(result);
+                location.reload();
+            });
         }
     }
 </script>
