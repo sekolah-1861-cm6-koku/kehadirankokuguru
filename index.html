@@ -11,116 +11,120 @@
             font-family: 'Poppins', sans-serif; 
             background: linear-gradient(135deg, #740202 0%, #dc2626 100%); 
             min-height: 100vh; display: flex; align-items: center; justify-content: center; 
-            padding: 20px; overflow-x: hidden; position: relative;
+            padding: 20px; overflow: hidden; position: relative;
         }
-        .cubes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
-        .cube { position: absolute; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); animation: animate 25s linear infinite; bottom: -150px; }
-        @keyframes animate { 0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; } 100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; } }
+        /* Lapisan Penutup (Overlay) untuk halang kelipan borang */
+        #loading-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 100; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; border-radius: 40px;
+        }
         .canva-card { 
             background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); width: 100%; max-width: 480px; 
             padding: 35px 20px; border-radius: 40px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); 
-            text-align: center; position: relative; z-index: 10;
+            text-align: center; position: relative; z-index: 10; min-height: 400px;
         }
-        .logo-img { width: 85px; margin: 0 auto 15px auto; display: block; cursor: pointer; transition: transform 0.3s; }
-        .logo-img:active { transform: scale(0.9); }
+        .logo-img { width: 85px; margin: 0 auto 15px auto; display: block; cursor: pointer; }
         .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
         .status-box { border: 3px solid #f3f4f6; padding: 15px 5px; border-radius: 20px; cursor: pointer; transition: all 0.3s; background: white; }
-        .status-box.active-hadir { border-color: #10b981; background: #ecfdf5; transform: translateY(-5px); }
-        .status-box.active-tak-hadir { border-color: #f59e0b; background: #fffbeb; transform: translateY(-5px); }
-        .select-style { width: 100%; padding: 16px; border: 2px solid #fee2e2; border-radius: 18px; margin-bottom: 20px; font-weight: 600; background-color: white; color: #374151; appearance: none; }
+        .status-box.active-hadir { border-color: #10b981; background: #ecfdf5; }
+        .status-box.active-tak-hadir { border-color: #f59e0b; background: #fffbeb; }
+        .select-style { width: 100%; padding: 16px; border: 2px solid #fee2e2; border-radius: 18px; margin-bottom: 20px; font-weight: 600; }
         .btn-detect { background-color: #4b5563; color: white; padding: 15px; border-radius: 15px; width: 100%; font-weight: 600; margin-bottom: 12px; }
-        .btn-clockin { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: white; padding: 18px; border-radius: 18px; width: 100%; font-weight: 700; border: none; }
+        .btn-clockin { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: white; padding: 18px; border-radius: 18px; width: 100%; font-weight: 700; }
         .btn-clockin:disabled { background: #d1d5db; opacity: 0.6; }
     </style>
 </head>
 <body>
 
-<div class="cubes">
-    <div class="cube" style="left: 25%; width: 80px; height: 80px; animation-delay: 0s;"></div>
-    <div class="cube" style="left: 70%; width: 60px; height: 60px; animation-delay: 4s;"></div>
-</div>
-
-<div class="canva-card">
-    <div class="logo-container" onclick="handleSecretClick()">
-        <img src="https://imgur.com/DLy3jZn.png" class="logo-img">
+<div class="canva-card" id="mainCard">
+    <div id="loading-overlay">
+        <div class="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <div class="text-sm font-bold text-gray-500 animate-pulse">MENYEMAK STATUS SISTEM...</div>
     </div>
 
-    <h1 class="font-bold text-gray-800 uppercase mb-1" style="font-size: clamp(12px, 4vw, 18px);">
-        SISTEM KEHADIRAN KOKURIKULUM GURU
-    </h1>
-    <p class="text-red-600 font-bold tracking-[0.2em] uppercase" style="font-size: clamp(9px, 2.5vw, 11px); margin-bottom: 30px;">
-        SK BANDAR TUN HUSSEIN ONN 2
-    </p>
-
-    <div id="formSection">
-        <label class="text-[10px] font-bold text-gray-400 uppercase block mb-2 text-left ml-2">1. Pilih Status Kehadiran</label>
-        <div class="status-grid">
-            <div id="boxHadir" class="status-box active-hadir" onclick="selectStatus('HADIR')">
-                <div class="text-2xl mb-1">✅</div>
-                <div class="text-[11px] font-bold text-green-700">HADIR</div>
-            </div>
-            <div id="boxTakHadir" class="status-box" onclick="selectStatus('TIDAK HADIR')">
-                <div class="text-2xl mb-1">❌</div>
-                <div class="text-[11px] font-bold text-amber-600">TIDAK HADIR</div>
-            </div>
+    <div id="content-area">
+        <div onclick="handleSecretClick()">
+            <img src="https://imgur.com/DLy3jZn.png" class="logo-img">
         </div>
 
-        <div class="text-left">
-            <label class="text-[10px] font-bold text-gray-400 uppercase block mb-2 ml-2">2. Pilih Nama Guru</label>
+        <h1 class="font-bold text-gray-800 uppercase mb-1" style="font-size: clamp(12px, 4vw, 18px);">
+            SISTEM KEHADIRAN KOKURIKULUM GURU
+        </h1>
+        <p class="text-red-600 font-bold tracking-[0.2em] uppercase mb-8" style="font-size: clamp(9px, 2.5vw, 11px);">
+            SK BANDAR TUN HUSSEIN ONN 2
+        </p>
+
+        <div id="formSection" style="display: none;">
+            <div class="status-grid">
+                <div id="boxHadir" class="status-box active-hadir" onclick="selectStatus('HADIR')">
+                    <div class="text-2xl mb-1">✅</div>
+                    <div class="text-[11px] font-bold text-green-700">HADIR</div>
+                </div>
+                <div id="boxTakHadir" class="status-box" onclick="selectStatus('TIDAK HADIR')">
+                    <div class="text-2xl mb-1">❌</div>
+                    <div class="text-[11px] font-bold text-amber-600">TIDAK HADIR</div>
+                </div>
+            </div>
+
             <select id="teacherName" class="select-style">
                 <option value="">-- MEMUAT SENARAI... --</option>
             </select>
+
+            <button id="detectBtn" class="btn-detect" onclick="detectLocation()">🔍 SAHKAN LOKASI SAYA</button>
+            <button id="inBtn" class="btn-clockin" onclick="saveRecord()" disabled>HANTAR KEHADIRAN</button>
         </div>
 
-        <button id="detectBtn" class="btn-detect" onclick="detectLocation()">🔍 SAHKAN LOKASI SAYA</button>
-        <button id="inBtn" class="btn-clockin" onclick="saveRecord()" disabled>HANTAR KEHADIRAN</button>
-    </div>
-
-    <div id="blockSection" class="hidden py-10">
-        <div class="text-6xl mb-4">🎉</div>
-        <h2 class="text-green-600 font-bold text-xl uppercase">Berjaya!</h2>
-        <p class="text-gray-500 text-sm mt-2">Rekod anda telah dihantar untuk hari ini.</p>
+        <div id="blockSection" class="hidden py-10">
+            <div class="text-6xl mb-4">🎉</div>
+            <h2 class="text-green-600 font-bold text-xl uppercase">Rekod Diterima</h2>
+            <p class="text-gray-500 text-sm mt-2">Terima kasih, kehadiran anda telah direkodkan.</p>
+        </div>
     </div>
 </div>
 
 <script>
-    // MASUKKAN URL WEB APP ANDA
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzdI4aGxMenu6kSeXKRYABJFJ_3dWEeqVYkXY6_cjZ3MrPKpaIdnPScRzYnZpsWQTfS/exec";
-    
     let selectedStatus = "HADIR";
     let userLat = ""; let userLng = ""; let clickCount = 0; let clickTimer;
 
-    const senaraiGuru = ["ABDUL KAHAR BIN AWANG SEMAN", "AINA ATHIRAH BINTI AHMAD SENARI", "AMIRAH BINTI MOHD ALWI", "AMINUDDIN BIN ISMAIL", "ARINAWATI BINTI MOHD YAH", "AWATIF BINTI MD YUSOP", "AZHAIRIN ZULAIHAN BINTI BADRUL HISHAM", "AZIMA BINTI MAT ZIN @ ISMAIL", "AZIZAH BINTI MOHAMMED", "AZMAN BIN OTHMAN", "DINITA A/P MUNIANDY", "EMIL NORULHUDA BINTI AMIRUDDIN", "FAIZA BINTI HASBULLAH", "FAIZAH BINTI IBRAHIM", "FARAWAHIDA BINTI MOHD SAFFUAN", "FARHANA BINTI ABDULLAH", "FARIDATUL AKMAAR BINTI MAT SAID", "FATIN FARHANA BINTI AMINUDDIN", "HAFIZI BIN OMAR", "HARISAH BINTI AWANG", "HARIZ IRFAN BIN HUSSIN PAKRI", "HASMAWATI BINTI OTHMAN", "HAZRAH BINTI MOHAMAD", "IRDINA AFIQAH BINTI ISMAIL", "IRMA AZNITA BINTI KAMBALI", "KANG CHIN KOAT", "KASUMMA BINTI PANDAK KAMAL", "MARYANI BINTI DRAMAN", "MAWADDAH HUDA BINTI MOHD AFFANDI", "MAZILA HAZLIN BINTI ABD MAJIT", "MOHAMAD MUNIR BIN ZAINUN", "MOHAMED SYAKIR BIN MD TAHIR", "MOHD SHAMILULHAYAT BIN MOHD ASRI", "MUHAMMAD AKASYAH SAIDON", "MUHAMMAD IRFAN WAZIF BIN MOHD NIZAM", "NADIAH BINTI IDRIS", "NAIM AISAMUDDIN BIN ABDUL RAZAK", "NAZIMATUL AMANI BINTI RAMLI", "NIK HAZIMAN BIN CHE DAUD", "NIK NUR LIYANA BINTI NIK MOHD FAUZI", "NITHILA A/P JAKANATHAN", "NOOR AZIZAH BINTI MD BAHARUDDIN", "NORAIDA BINTI MUSTAPHA", "NORAMANI BINTI MAT NOR", "NORMA BINTI ISMAIL", "NORUL HUDA BINTI JAMIN", "NOUR EZIEZAH BINTI MAZMAN", "NUR FATHIN BINTI ZAKI", "NUR SYAFIQAH BINTI ZAHIRUDIN", "NUR ZURIYATIE BINTI AZIZ", "NURUL HAZIQAH BINTI RAMLI", "NURUL ULYA BINTI NORDIN", "PIRAKAS A/L SHANGAR", "ROHAIZA BINTI RAZALI", "ROSNAH BINTI JANTAN", "RUBINA BINTI RAMLI", "SAHARINA BINTI ABDULLAH", "SITI HAWA BINTI MAT YAJID", "SITI MASHITAH BINTI MOHD ASRI", "SITI NORASYIKIN BINTI ABDULLAH", "SITI NUR DIANA BINTI MOHAMAD NASIR", "SULAIMAN BIN HASSAN", "SUZILA BINTI MOHD NOR", "SYARFIZA BINTI ABDUL WAHAB SHAARANI", "TG IHTIFAZUDDIN BIN TG IBRAHIM", "UMI NUR HANIRA BINTI ISMAIL", "WAN FAIRIS BIN A. KAMAR", "ZABIDI BIN MOHAMMAD", "ZANIRAH BINTI A. BAKAR"];
+    const senaraiGuru = ["ABDUL KAHAR BIN AWANG SEMAN", "AINA ATHIRAH BINTI AHMAD SENARI", "AMIRAH BINTI MOHD ALWI", "AMINUDDIN BIN ISMAIL", "ARINAWATI BINTI MOHD YAH", "AWATIF BINTI MD YUSOP", "AZHAIRIN ZULAIHAN BINTI BADRUL HISHAM", "AZIMA BINTI MAT ZIN @ ISMAIL", "AZIZAH BINTI MOHAMMED", "AZMAN BIN OTHMAN", "DINITA A/P MUNIANDY", "EMIL NORULHUDA BINTI AMIRUDDIN", "FAIZA BINTI HASBULLAH", "FAIZAH BINTI IBRAHIM", "FARAWAHIDA BINTI MOHD SAFFUAN", "FARIDATUL AKMAAR BINTI MAT SAID", "FATIN FARHANA BINTI AMINUDDIN", "HAFIZI BIN OMAR", "HARISAH BINTI AWANG", "HARIZ IRFAN BIN HUSSIN PAKRI", "HASMAWATI BINTI OTHMAN", "HAZRAH BINTI MOHAMAD", "IRDINA AFIQAH BINTI ISMAIL", "IRMA AZNITA BINTI KAMBALI", "KANG CHIN KOAT", "KASUMMA BINTI PANDAK KAMAL", "MARYANI BINTI DRAMAN", "MAWADDAH HUDA BINTI MOHD AFFANDI", "MAZILA HAZLIN BINTI ABD MAJIT", "MOHAMAD MUNIR BIN ZAINUN", "MOHAMED SYAKIR BIN MD TAHIR", "MOHD SHAMILULHAYAT BIN MOHD ASRI", "MUHAMMAD AKASYAH SAIDON", "MUHAMMAD IRFAN WAZIF BIN MOHD NIZAM", "NADIAH BINTI IDRIS", "NAIM AISAMUDDIN BIN ABDUL RAZAK", "NAZIMATUL AMANI BINTI RAMLI", "NIK HAZIMAN BIN CHE DAUD", "NIK NUR LIYANA BINTI NIK MOHD FAUZI", "NITHILA A/P JAKANATHAN", "NOOR AZIZAH BINTI MD BAHARUDDIN", "NORAIDA BINTI MUSTAPHA", "NORAMANI BINTI MAT NOR", "NORMA BINTI ISMAIL", "NORUL HUDA BINTI JAMIN", "NOUR EZIEZAH BINTI MAZMAN", "NUR FATHIN BINTI ZAKI", "NUR SYAFIQAH BINTI ZAHIRUDIN", "NUR ZURIYATIE BINTI AZIZ", "NURUL HAZIQAH BINTI RAMLI", "NURUL ULYA BINTI NORDIN", "PIRAKAS A/L SHANGAR", "ROHAIZA BINTI RAZALI", "ROSNAH BINTI JANTAN", "RUBINA BINTI RAMLI", "SAHARINA BINTI ABDULLAH", "SITI HAWA BINTI MAT YAJID", "SITI MASHITAH BINTI MOHD ASRI", "SITI NORASYIKIN BINTI ABDULLAH", "SITI NUR DIANA BINTI MOHAMAD NASIR", "SULAIMAN BIN HASSAN", "SUZILA BINTI MOHD NOR", "TG IHTIFAZUDDIN BIN TG IBRAHIM", "UMI NUR HANIRA BINTI ISMAIL", "WAN FAIRIS BIN A. KAMAR", "ZABIDI BIN MOHAMMAD", "ZANIRAH BINTI A. BAKAR"];
 
     window.onload = async function() {
-        const select = document.getElementById('teacherName');
+        const overlay = document.getElementById('loading-overlay');
+        const formSection = document.getElementById('formSection');
+        const contentArea = document.getElementById('content-area');
         const today = new Date().toLocaleDateString();
 
         try {
-            // 1. SEMAK STATUS KUNCI DARI SERVER
+            // 1. Cek Status Kunci Serta-merta
             const statusResp = await fetch(`${WEB_APP_URL}?action=getStatus`);
             const systemStatus = await statusResp.text();
             
             if (systemStatus === "closed") {
-                document.getElementById('formSection').innerHTML = `
-                    <div class="py-10 text-center">
-                        <div class="text-6xl mb-4">🔒</div>
-                        <h2 class="text-red-600 font-bold text-xl uppercase">Sistem Ditutup</h2>
-                        <p class="text-gray-500 text-sm mt-2">Maaf, sesi kehadiran telah ditutup oleh admin.</p>
+                contentArea.innerHTML = `
+                    <div class="py-20 text-center">
+                        <div class="text-7xl mb-6">🔒</div>
+                        <h2 class="text-red-600 font-bold text-2xl uppercase">SISTEM DITUTUP</h2>
+                        <p class="text-gray-500 mt-4">Maaf, admin telah menutup sesi kehadiran hari ini.</p>
+                        <button onclick="adminControl()" class="mt-8 text-xs text-gray-300">Admin Only</button>
                     </div>`;
+                overlay.style.display = "none";
                 return;
             }
 
-            // 2. SEMAK JIKA DAH HANTAR HARI INI
+            // 2. Cek Jika Peranti Ini Dah Hantar (Local Check)
             if(localStorage.getItem('last_submit_date') === today) {
                 document.getElementById('formSection').classList.add('hidden');
                 document.getElementById('blockSection').classList.remove('hidden');
+                overlay.style.display = "none";
                 return;
             }
 
-            // 3. MUAT SENARAI GURU & TANDA ✅
+            // 3. Muat Senarai Nama
             const resp = await fetch(WEB_APP_URL);
             const namesDone = await resp.json();
+            const select = document.getElementById('teacherName');
             select.innerHTML = '<option value="">-- SILA PILIH NAMA --</option>';
             senaraiGuru.sort().forEach(nama => {
                 let opt = document.createElement('option');
@@ -128,8 +132,12 @@
                 opt.innerHTML = namesDone.includes(nama) ? "✅ " + nama : nama;
                 select.appendChild(opt);
             });
+
+            formSection.style.display = "block";
+            overlay.style.display = "none";
+
         } catch(e) {
-            console.log("Error Loading:", e);
+            overlay.innerHTML = "<div class='p-4 text-center'>Ralat Sambungan. Sila refresh semula.</div>";
         }
     }
 
@@ -141,9 +149,9 @@
     }
 
     function detectLocation() {
-        const schoolLat = 3.052485; const schoolLog = 101.754269;
         navigator.geolocation.getCurrentPosition((pos) => {
             userLat = pos.coords.latitude; userLng = pos.coords.longitude;
+            const schoolLat = 3.052485; const schoolLog = 101.754269;
             const R = 6371e3;
             const d1 = schoolLat * Math.PI/180; const d2 = userLat * Math.PI/180;
             const df = (userLat-schoolLat) * Math.PI/180; const dl = (userLng-schoolLog) * Math.PI/180;
@@ -159,46 +167,30 @@
         }, () => alert("Sila benarkan akses GPS."), { enableHighAccuracy: true });
     }
 
-  function saveRecord() {
-    const nama = document.getElementById('teacherName').value;
-    if (!nama) return alert("Sila pilih nama!");
-    
-    // ID Unik berdasarkan info browser & saiz skrin
-    const uniqueID = (navigator.userAgent + screen.width + screen.height).replace(/\s+/g, '');
+    function saveRecord() {
+        const nama = document.getElementById('teacherName').value;
+        if (!nama) return alert("Sila pilih nama!");
+        const uniqueID = (navigator.userAgent + screen.width + screen.height).replace(/\s+/g, '');
 
-    document.getElementById('inBtn').innerText = "MENYEMAK PERANTI...";
-    document.getElementById('inBtn').disabled = true;
+        document.getElementById('inBtn').innerText = "MENYEMAK...";
+        document.getElementById('inBtn').disabled = true;
 
-    fetch(WEB_APP_URL, {
-        method: "POST",
-        body: JSON.stringify({ 
-            nama: nama, 
-            status: selectedStatus, 
-            lat: userLat, 
-            lng: userLng, 
-            deviceId: uniqueID 
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            body: JSON.stringify({ nama: nama, status: selectedStatus, lat: userLat, lng: userLng, deviceId: uniqueID })
         })
-    })
-    .then(res => res.text())
-    .then(result => {
-        if (result === "DUPLICATE_NAME") {
-            alert("MAAF: Nama anda sudah direkodkan untuk hari ini!");
-        } else if (result === "LIMIT_DEVICE") {
-            alert("SEKATAN: Peranti ini telah digunakan untuk menghantar kehadiran. Sila gunakan peranti sendiri (1 Peranti = 1 Nama).");
-        } else if (result === "Success") {
-            localStorage.setItem('last_submit_date', new Date().toLocaleDateString());
-            alert("KEHADIRAN BERJAYA DIREKOD!");
-        } else {
-            alert("RALAT: " + result);
-        }
-        location.reload();
-    })
-    .catch(err => {
-        alert("RALAT SAMBUNGAN: Sila pastikan internet stabil.");
-        document.getElementById('inBtn').disabled = false;
-        document.getElementById('inBtn').innerText = "HANTAR KEHADIRAN";
-    });
-}
+        .then(res => res.text())
+        .then(result => {
+            if (result === "DUPLICATE_NAME") alert("Nama anda sudah direkodkan!");
+            else if (result === "LIMIT_DEVICE") alert("Satu peranti hanya untuk satu nama!");
+            else if (result === "Success") {
+                localStorage.setItem('last_submit_date', new Date().toLocaleDateString());
+                alert("BERJAYA!");
+            }
+            location.reload();
+        });
+    }
+
     function handleSecretClick() {
         clickCount++; clearTimeout(clickTimer);
         if (clickCount === 3) { adminControl(); clickCount = 0; }
@@ -208,13 +200,10 @@
     function adminControl() {
         const pass = prompt("MOD ADMIN:");
         if(pass === "KOKU4055") {
-            alert("Sila tunggu, menukar status sistem...");
+            alert("Menukar status sistem...");
             fetch(`${WEB_APP_URL}?action=toggle`)
             .then(res => res.text())
-            .then(result => {
-                alert(result);
-                location.reload();
-            });
+            .then(result => { alert(result); location.reload(); });
         }
     }
 </script>
