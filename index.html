@@ -23,7 +23,7 @@
             text-align: center; position: relative; z-index: 10;
         }
 
-        /* --- EFEK KELIPAN MERAH DI BELAKANG LOGO --- */
+        /* EFEK KELIPAN MERAH DI BELAKANG LOGO */
         .logo-container {
             position: relative; width: 85px; height: 85px; margin: 0 auto 15px auto;
             display: flex; justify-content: center; align-items: center;
@@ -105,7 +105,7 @@
 
 <script>
     // URL DEPLOYMENT BARU ANDA
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzoeEpq1RL07bkNXrXlOrcsfmwFpm0UVkws8kRDfGuHwgYqDCzQVyn3DkUaCY-kXtON/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyZnu6RWcrQnkLN2anyS7vj65XEFSc_7xU9x_4d3lN_K2s0hxusNJclAgsKu6pjyeD8/exec";
     
     let selectedStatus = "HADIR";
     let userLat = ""; let userLng = ""; let clickCount = 0; let clickTimer;
@@ -117,6 +117,7 @@
         const today = new Date().toLocaleDateString();
 
         try {
+            // Ambil status sistem
             const statusResp = await fetch(`${WEB_APP_URL}?action=getStatus`);
             const systemStatus = await statusResp.text();
             
@@ -125,12 +126,14 @@
                 return;
             }
 
+            // Semak jika sudah isi hari ini
             if(localStorage.getItem('last_submit_date') === today) {
                 document.getElementById('formSection').classList.add('hidden');
                 document.getElementById('blockSection').classList.remove('hidden');
                 return;
             }
 
+            // Ambil senarai yang sudah isi
             const resp = await fetch(WEB_APP_URL);
             const namesDone = await resp.json();
             
@@ -198,9 +201,9 @@
             alert("KEHADIRAN BERJAYA!");
             location.reload();
         }).catch(() => {
-            // No-cors trigger catch but often still works
+            // Mode POST selalunya berjaya walaupun trigger catch
             localStorage.setItem('last_submit_date', new Date().toLocaleDateString());
-            alert("REKOD DIHANTAR!");
+            alert("REKOD TELAH DIHANTAR!");
             location.reload();
         });
     }
