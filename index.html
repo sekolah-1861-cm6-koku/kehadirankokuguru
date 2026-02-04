@@ -21,7 +21,19 @@
             padding: 35px 20px; border-radius: 40px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); 
             text-align: center; position: relative; z-index: 10;
         }
-        .logo-img { width: 85px; margin: 0 auto 15px auto; display: block; cursor: pointer; transition: transform 0.3s; }
+
+        /* --- TAMBAHAN KESAN BLINKING MERAH PADA LOGO --- */
+        @keyframes logo-red-blink {
+            0% { filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.6)); }
+            50% { filter: drop-shadow(0 0 20px rgba(255, 0, 0, 1)); }
+            100% { filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.6)); }
+        }
+        .logo-img { 
+            width: 85px; margin: 0 auto 15px auto; display: block; cursor: pointer; transition: transform 0.3s; 
+            animation: logo-red-blink 1.5s infinite; /* Menjalankan animasi */
+        }
+        /* ---------------------------------------------- */
+
         .logo-img:active { transform: scale(0.9); }
         .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
         .status-box { border: 3px solid #f3f4f6; padding: 15px 5px; border-radius: 20px; cursor: pointer; transition: all 0.3s; background: white; }
@@ -84,7 +96,6 @@
 </div>
 
 <script>
-    // MASUKKAN URL WEB APP ANDA
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzdI4aGxMenu6kSeXKRYABJFJ_3dWEeqVYkXY6_cjZ3MrPKpaIdnPScRzYnZpsWQTfS/exec";
     
     let selectedStatus = "HADIR";
@@ -97,7 +108,6 @@
         const today = new Date().toLocaleDateString();
 
         try {
-            // 1. SEMAK STATUS KUNCI DARI SERVER
             const statusResp = await fetch(`${WEB_APP_URL}?action=getStatus`);
             const systemStatus = await statusResp.text();
             
@@ -111,14 +121,12 @@
                 return;
             }
 
-            // 2. SEMAK JIKA DAH HANTAR HARI INI
             if(localStorage.getItem('last_submit_date') === today) {
                 document.getElementById('formSection').classList.add('hidden');
                 document.getElementById('blockSection').classList.remove('hidden');
                 return;
             }
 
-            // 3. MUAT SENARAI GURU & TANDA ✅
             const resp = await fetch(WEB_APP_URL);
             const namesDone = await resp.json();
             select.innerHTML = '<option value="">-- SILA PILIH NAMA --</option>';
