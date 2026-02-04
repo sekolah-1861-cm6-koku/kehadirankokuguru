@@ -16,25 +16,52 @@
         .cubes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
         .cube { position: absolute; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); animation: animate 25s linear infinite; bottom: -150px; }
         @keyframes animate { 0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; } 100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; } }
+        
         .canva-card { 
             background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); width: 100%; max-width: 480px; 
             padding: 35px 20px; border-radius: 40px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); 
             text-align: center; position: relative; z-index: 10;
         }
 
-        /* --- TAMBAHAN KESAN BLINKING MERAH PADA LOGO --- */
-        @keyframes logo-red-blink {
-            0% { filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.6)); }
-            50% { filter: drop-shadow(0 0 20px rgba(255, 0, 0, 1)); }
-            100% { filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.6)); }
+        /* --- EFEK KELIPAN MERAH --- */
+        .logo-container {
+            position: relative;
+            width: 85px;
+            height: 85px;
+            margin: 0 auto 15px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .logo-img { 
-            width: 85px; margin: 0 auto 15px auto; display: block; cursor: pointer; transition: transform 0.3s; 
-            animation: logo-red-blink 1.5s infinite; /* Menjalankan animasi */
-        }
-        /* ---------------------------------------------- */
 
+        .logo-img { 
+            width: 100%;
+            display: block; 
+            cursor: pointer; 
+            transition: transform 0.3s;
+            position: relative;
+            z-index: 2; 
+        }
         .logo-img:active { transform: scale(0.9); }
+
+        .logo-container::before {
+            content: '';
+            position: absolute;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(220, 38, 38, 0.6) 0%, rgba(220, 38, 38, 0) 70%);
+            animation: glowRed 2s infinite ease-in-out;
+        }
+
+        @keyframes glowRed {
+            0% { transform: scale(0.8); opacity: 0.4; }
+            50% { transform: scale(1.4); opacity: 1; }
+            100% { transform: scale(0.8); opacity: 0.4; }
+        }
+        /* --- TAMAT EFEK KELIPAN --- */
+
         .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
         .status-box { border: 3px solid #f3f4f6; padding: 15px 5px; border-radius: 20px; cursor: pointer; transition: all 0.3s; background: white; }
         .status-box.active-hadir { border-color: #10b981; background: #ecfdf5; transform: translateY(-5px); }
@@ -96,7 +123,8 @@
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzdI4aGxMenu6kSeXKRYABJFJ_3dWEeqVYkXY6_cjZ3MrPKpaIdnPScRzYnZpsWQTfS/exec";
+    // URL DEPLOYMENT BARU ANDA
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzoeEpq1RL07bkNXrXlOrcsfmwFpm0UVkws8kRDfGuHwgYqDCzQVyn3DkUaCY-kXtON/exec";
     
     let selectedStatus = "HADIR";
     let userLat = ""; let userLng = ""; let clickCount = 0; let clickTimer;
@@ -138,6 +166,7 @@
             });
         } catch(e) {
             console.log("Error Loading:", e);
+            select.innerHTML = '<option value="">-- RALAT MEMUAT DATA --</option>';
         }
     }
 
